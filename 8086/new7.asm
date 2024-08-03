@@ -1,0 +1,40 @@
+.MODEL SMALL
+.STACK 100
+.DATA
+		CHAR DB 'm'
+		NL DB 0AH,0DH,'$'
+		STR1 DB "The capital letter of $"
+		STR2 DB " is $"
+
+.CODE
+MAIN PROC
+
+		MOV AX,@DATA
+		MOV DS,AX
+		
+		MOV AH,09H
+		LEA DX,STR1
+		INT 21H
+		
+		MOV AH,02H
+		MOV BL,CHAR
+		SUB BL,32
+		MOV DL,BL
+		
+		INT 21H
+		
+		MOV AH,09H
+		LEA DX,STR2
+		INT 21H
+		
+		MOV AH,02H
+		MOV BL,CHAR
+		MOV DL,BL
+		
+		INT 21H
+
+		MOV AX,4C00H
+		INT 21H
+
+MAIN ENDP
+END MAIN

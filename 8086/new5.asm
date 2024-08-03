@@ -1,0 +1,43 @@
+.MODEL SMALL
+.STACK 100
+.DATA
+		num1 DB 3
+		num2 DB 5
+
+.CODE
+MAIN PROC
+
+		MOV AX,@DATA
+		MOV DS,AX
+		
+		MOV AH,02H
+
+		MOV BL,num1
+		MOV DL,BL
+		ADD DL,30H
+		INT 21H
+		
+		MOV BL,'+'
+		MOV DL,BL
+		INT 21H
+		
+		MOV BL,num2
+		MOV DL,BL
+		ADD DL,30H
+		INT 21H
+		
+		MOV BL,'='
+		MOV DL,BL
+		INT 21H
+		
+		MOV BL,num1
+		ADD BL,num2
+		MOV DL,BL
+		ADD DL,30H
+		INT 21H
+
+		MOV AX,4C00H
+		INT 21H
+
+MAIN ENDP
+END MAIN
