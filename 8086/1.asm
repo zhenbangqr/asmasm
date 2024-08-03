@@ -3,10 +3,9 @@
 .DATA
 
 		STR1 DB 'Enter digit 1: $'
-		STR2 DB 'Enter digit 2: $'
-		STR3 DB 'Product is '
 		STR4 DB 'Sum is '
-		STR5 DB 'Difference is $'
+		STR5 DB 'Sum is '
+		STR5 DB 'Difference are $'
 		NUM1 DB ?
 		NUM2 DB ?
 		NL DB 0AH,0DH,'$'
