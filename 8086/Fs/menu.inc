@@ -1,6 +1,5 @@
-.model small
-.stack 100
-.data
+
+.DATA
 	menuTitle db "========================================", 0dh, 0ah, "==       Phone Inventory System       ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
 	menuChoice db "1. Stock In", 0dh, 0ah, "2. Stock Out", 0dh, 0ah, "3. Search Stock", 0dh, 0ah, "4. Generate Stock Report", 0dh, 0ah, "5. Exit", 0dh, 0ah, "$"
 	promptChoice db "Enter a digit(1-5): $"
@@ -9,7 +8,8 @@
 	newLine db 0dh,0ah,"$"
 	choice db ?
 
-.code
+.CODE
+
 user_Menu proc
 	
 choiceLoop:
