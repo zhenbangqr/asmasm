@@ -2,8 +2,6 @@
     menuTitle db "========================================", 0dh, 0ah, "==       Phone Inventory System       ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
     menuChoice db "1. Stock In", 0dh, 0ah, "2. Stock Out", 0dh, 0ah, "3. Search Stock", 0dh, 0ah, "4. Generate Stock Report", 0dh, 0ah, "5. Exit", 0dh, 0ah, "$"
     promptChoice db "Enter a digit(1-5): $"
-    invalidMsg db "Invalid input. Please Enter a valid digit(1-5).", 0dh, 0ah, "$"
-
 .CODE
 
 user_Menu PROC
@@ -41,15 +39,14 @@ choiceLoop:
     CMP AL, 5
     JA invalidChoice
 	
-	MOV choiceMenu,AL
+	MOV choice,AL
 	RET 
     
 invalidChoice:
-	
 	CALL clear_Screen 
 	
     MOV AH, 09H
-    LEA DX, invalidMsg
+    LEA DX, invalidInputMsg
     INT 21H
     
     MOV AH, 09H

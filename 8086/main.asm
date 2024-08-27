@@ -1,8 +1,9 @@
 .MODEL SMALL
 .STACK 100
 .DATA 
-    choiceMenu DB ?
+    choice DB ?
     newLine DB 0DH,0AH,"$"    ; Newline definition
+	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"
 	MSG1 db "STOCK IN$"
 	MSG2 db "STOCK OUT$"
 	MSG3 db "SEARCH$"
@@ -13,6 +14,7 @@
 
 ;-- INCLUDE the menu file
 INCLUDE Fs\menu.inc
+INCLUDE Fs\search.inc
 INCLUDE Simon\clnScr.inc
 
 MAIN PROC 
@@ -25,15 +27,15 @@ menuLoop:
 	CALL clear_Screen
 	
     ; Go To Choice
-    CMP choiceMenu, 1
+    CMP choice, 1
     JE stockIn
-    CMP choiceMenu, 2
+    CMP choice, 2
     JE stockOut
-    CMP choiceMenu, 3
+    CMP choice, 3
     JE searchStock
-    CMP choiceMenu, 4
+    CMP choice, 4
     JE generateReport
-    CMP choiceMenu, 5
+    CMP choice, 5
     JE exitProgram
 
 	
@@ -64,13 +66,9 @@ stockOut:
 searchStock:
     ; Code for Search Stock
 	
-	MOV AH,09H
-    LEA DX, MSG3
-    INT 21H
+	call searchPhoneStock
 	
-	MOV AH, 09H
-    LEA DX, newLine
-    INT 21H
+	call clear_Screen
 	
     JMP menuLoop
 
