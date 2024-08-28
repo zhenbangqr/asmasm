@@ -16,12 +16,14 @@
 INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Simon\clnScr.inc
+INCLUDE Simon\login.inc
 
 MAIN PROC 
     MOV AX,@DATA
     MOV DS,AX
 
 menuLoop:
+	CALL user_login
     CALL user_Menu    ; Call the user menu function
 	
 	CALL clear_Screen
