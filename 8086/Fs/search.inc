@@ -11,11 +11,9 @@
 	arrNum DW ?
 .CODE
 searchPhoneStock PROC
-	searchLoop:
-	
 	MOV AH, 09H
 	LEA DX, searchPrompt
-	INT 21H
+		INT 21H
 
 	MOV AH, 0AH
 	LEA DX, searchInput
@@ -26,26 +24,11 @@ searchPhoneStock PROC
 	LEA DX, newLine
 	INT 21H
 	
-	MOV AH, 09H
-	LEA DX, searchStr
-	INT 21H
-	
 	;New Line
 	MOV AH, 09H
 	LEA DX, newLine
 	INT 21H
 	
-	CALL cmpString
-	
-	CALL continueSearch
-	
-	CMP choice, 1
-	JE searchLoop
-	CMP choice, 2
-	JE ExitSearchLoop
-	CMP choice, 3
-	JE ExitSearchLoop
-		
 	ExitSearchLoop:
 		RET
 		
@@ -67,14 +50,6 @@ compare:
 		MOV BL, str[DI]
 		CMP BL, "$"
 		JE failSearch
-		
-		MOV AH, 02H
-		MOV DL, str[DI]
-		INT 21H
-		
-		MOV AH, 02H
-		MOV DL, searchInput[SI]
-		INT 21H
 				
 		CMP BL, searchInput[SI]
 		JNE failCompare

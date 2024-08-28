@@ -67,12 +67,21 @@ stockOut:
 
 searchStock:
     ; Code for Search Stock
-	
+	searchLoop:
 	call searchPhoneStock
+		
+	CALL cmpString
+	
+	CALL continueSearch
+	
+	CMP choice, 1
+	JE searchLoop
+	CMP choice, 2
+	JE menuLoop
+	CMP choice, 3
+	JE menuLoop		
 	
 	call clear_Screen
-	
-    JMP menuLoop
 
 generateReport:
     ; Code for Generate Report
