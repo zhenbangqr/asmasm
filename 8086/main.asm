@@ -99,6 +99,8 @@ generateReport:
     LEA DX, newLine
     INT 21H
 	
+	CALL reportMenu
+	
     JMP menuLoop
 
 exitProgram:
