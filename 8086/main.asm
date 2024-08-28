@@ -17,6 +17,7 @@ INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Simon\clnScr.inc
 INCLUDE Simon\login.inc
+INCLUDE report.inc
 
 MAIN PROC 
     MOV AX,@DATA
@@ -93,6 +94,8 @@ generateReport:
 	MOV AH, 09H
     LEA DX, newLine
     INT 21H
+	
+	CALL reportMenu
 	
     JMP menuLoop
 
