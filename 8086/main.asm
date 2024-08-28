@@ -2,8 +2,9 @@
 .STACK 100
 .DATA 
     choice DB ?
+	loginCheck DB 0
     newLine DB 0DH,0AH,"$"    ; Newline definition
-	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"
+	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"                       
 	MSG1 db "STOCK IN$"
 	MSG2 db "STOCK OUT$"
 	MSG3 db "SEARCH$"
@@ -23,8 +24,11 @@ MAIN PROC
     MOV AX,@DATA
     MOV DS,AX
 
-menuLoop:
+loginLoop:
 	CALL user_login
+	
+	
+menuLoop:
     CALL user_Menu    ; Call the user menu function
 	
 	CALL clear_Screen
@@ -94,8 +98,6 @@ generateReport:
 	MOV AH, 09H
     LEA DX, newLine
     INT 21H
-	
-	CALL reportMenu
 	
     JMP menuLoop
 
