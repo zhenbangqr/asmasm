@@ -113,11 +113,11 @@ compareUserPassword:
 	MOV CX,defaultLengthPassword
 	PasswordCompare:
 	
-	MOV BL,inputUserPassword[SI+2]
+	MOV BL,inputUserPassword[SI]
     CMP BL,defaultPassword[SI]
 	
 	MOV AH,02H
-	MOV DL,inputUserPassword[SI+1]
+	MOV DL,inputUserPassword[SI]
 	INT 21H
 	
 	MOV AH,09H
@@ -128,7 +128,7 @@ compareUserPassword:
 	MOV DL,defaultPassword[SI]
 	INT 21H
 	
-    ;--JNE invalidUser
+    JNE invalidUser
 	INT 21H
 	
 	INC SI	
