@@ -17,7 +17,7 @@ INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Simon\clnScr.inc
 INCLUDE Simon\login.inc
-INCLUDE report.inc
+INCLUDE Kh\report.inc
 
 MAIN PROC 
     MOV AX,@DATA
