@@ -16,19 +16,25 @@
 ;-- INCLUDE the menu file
 INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
+INCLUDE Fs\display.inc
 INCLUDE Simon\clnScr.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\report.inc
 
 MAIN PROC 
     MOV AX,@DATA
-    MOV DS,AX
+    MOV DS,AX	
+	
+	CALL readStockFile
+	
+	MOV AX, 4C00H
+    INT 21H
 
 loginLoop:
 	CALL user_login
 	
-	
 menuLoop:
+
     CALL user_Menu    ; Call the user menu function
 	
 	CALL clear_Screen

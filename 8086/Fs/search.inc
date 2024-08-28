@@ -10,10 +10,15 @@
 	str DB "Tiong$"
 	arrNum DW ?
 .CODE
+
+;----------------------------------------------
+;	searchPhoneStock
+;	Enter the phone name to search the stock
+;----------------------------------------------
 searchPhoneStock PROC
 	MOV AH, 09H
 	LEA DX, searchPrompt
-		INT 21H
+	INT 21H
 
 	MOV AH, 0AH
 	LEA DX, searchInput
@@ -35,14 +40,16 @@ searchPhoneStock PROC
 searchPhoneStock ENDP
 
 
-
+;--------------------------------------------------------------
+;	cmpString
+;	compare the string read from file with the entered string
+;--------------------------------------------------------------
 cmpString PROC
 	MOV DI, 0
 	JMP compare
 	
 compare:
 	MOV arrNum, DI
-	MOV SI, 2
 	MOV CX, 0
 	MOV CL, searchInput[1]
 	
@@ -68,7 +75,6 @@ failCompare:
 	MOV DI, arrNum
 	JMP compare
 	
-	
 failSearch:
 	MOV AH, 09H
 	LEA DX, searchFailMsg
@@ -80,7 +86,10 @@ finish:
 cmpString ENDP
 
 
-
+;--------------------------------------------------------------
+;	continueSearch
+;	Ask user whether want to continue search the phone or not
+;--------------------------------------------------------------
 continueSearch PROC
 
 nextStepChoiceLoop:
