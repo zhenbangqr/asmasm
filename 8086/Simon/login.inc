@@ -1,5 +1,5 @@
 .DATA 
-	loginTitle DB "========================================", 0dh, 0ah, "==       Phone Inventory System       ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	loginTitle DB "========================================", 0dh, 0ah, "==                Login               ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
 	promptLoginID DB "Enter user-ID :$"
 	promptPassword DB "Password :$"
 	
