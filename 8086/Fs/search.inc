@@ -7,8 +7,7 @@
 	strLength DB 30
 	strActNum DB ?
 	searchStr DB 30 DUP("$") 
-	str DB "Tiong$"
-	arrNum DW ?
+	arrNum DW 0
 .CODE
 
 ;--------------------------------------------------------------
@@ -85,23 +84,25 @@ searchPhoneStock ENDP
 ;	compare the string read from file with the entered string
 ;--------------------------------------------------------------
 cmpString PROC
-	MOV DI, 0
+	MOV arrNum, 0
+	MOV BX, 0
 	JMP compare
 	
 compare:
-	MOV arrNum, DI
+	MOV arrNum, BX
+	MOV DI, 2
 	MOV CX, 0
 	MOV CL, searchInput[1]
 	
 	compareLoop:
-		MOV BL, Stock.phoneName[DI]
-		CMP BL, "$"
-		JE failSearch
+		MOV AL, Stock.phoneName[BX]
+		CMP AL, "$"
+		JE finish
 				
-		CMP BL, searchInput[SI]
+		CMP AL, searchInput[DI]
 		JNE failCompare
 		
-		INC SI
+		INC BX
 		INC DI
 	LOOP compareLoop
 	
@@ -112,13 +113,8 @@ compare:
 
 failCompare:
 	INC arrNum
-	MOV DI, arrNum
+	MOV BX, arrNum
 	JMP compare
-	
-failSearch:
-	MOV AH, 09H
-	INT 21H
-	JMP finish
 	
 finish:
 	RET
@@ -130,6 +126,15 @@ cmpString ENDP
 ;	display the Stock Details
 ;-----------------------------------------
 displayStockDetails PROC
+	MOV AH, 02H
+	MOV DL, numStockFound
+	ADD DL, 30H
+	INT 21H
+
+	MOV AH, 02H
+	MOV DL, '.'
+	INT 21H
+	
 	MOV AH, 09H
 	LEA DX, Stock.phoneName
 	INT 21H
@@ -146,9 +151,9 @@ displayStockDetails PROC
 	LEA DX, Stock.phoneColor
 	INT 21H
 	
-	MOV AH,09H
-    LEA DX,newLine
-    INT 21H
+	MOV AH, 09H
+	LEA DX, newLine
+	INT 21H
 	
 	RET
 displayStockDetails ENDP

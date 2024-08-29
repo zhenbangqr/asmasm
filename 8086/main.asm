@@ -5,6 +5,7 @@
 	searchCheck DB 0
 	numStockFound DB 0
 	loginCheck DB 0
+	eofHolder DW ?
     newLine DB 0DH,0AH,"$"    ; Newline definition
 	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"  	
 	MSG1 db "STOCK IN$"
@@ -82,42 +83,49 @@ stockOut:
     JMP menuLoop
 
 searchStock:
-    ; Code for Search Stock	
-	CALL openReadStockFile
+    ; Code for Search Stock
+	searchStockLoop:
+		MOV numStockFound, 0
+		CALL searchMenu
+		
+		CMP choice, 2
+		JE menuLoop
+		
+		call clear_Screen 
+		
+		CALL openReadStockFile
+		MOV searchCheck, 0
+		CALL searchPhoneStock
+		JMP compareStringLoop
+
 	
-	CALL readStockDetails
-	CALL displayStockDetails
+	compareStringLoop:
+		CALL readStockDetails
+
+		MOV searchCheck, 0
+		CALL cmpString
+		CMP searchCheck, 1
+		JE displayResult
+
+		MOV AX, [SI]
+		CMP AX, 0
+		JE EndDisplayResult
+		
+		JMP compareStringLoop
 	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL readStockDetails
-	CALL displayStockDetails
-	
-	CALL closeStockFile
-	
-	JMP exitProgram
+	displayResult:
+		INC numStockFound
+		CALL displayStockDetails
+		
+		MOV AX, [SI]
+		CMP AX, 0
+		JE EndDisplayResult
+		
+		JMP compareStringLoop
+		
+	EndDisplayResult:
+		CALL closeStockFile
+		JMP searchStockLoop
 generateReport:
     ; Code for Generate Report
 	
