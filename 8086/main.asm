@@ -2,20 +2,35 @@
 .STACK 100
 .DATA 
     choice DB ?
+	searchCheck DB 0
+	numStockFound DB 0
 	loginCheck DB 0
+	eofHolder DW ?
     newLine DB 0DH,0AH,"$"    ; Newline definition
-	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"                       
+	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"  	
 	MSG1 db "STOCK IN$"
 	MSG2 db "STOCK OUT$"
 	MSG3 db "SEARCH$"
 	MSG4 db "GENERATE$"
 	MSG5 db "EXIT$"
 
+	phone STRUC
+		phoneName DB 20 DUP('$')
+		phoneRAM DB 20 DUP('$')
+		phoneROM DB 20 DUP('$')
+		phoneColor DB 20 DUP('$')
+		phonePrice DB ?
+		phonePriceFP DB ?
+	phone ENDS
+	
+	Stock phone<>
+
 .CODE
 
 ;-- INCLUDE the menu file
 INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
+INCLUDE Fs\read.inc
 INCLUDE Simon\clnScr.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\report.inc
@@ -27,11 +42,9 @@ MAIN PROC
 loginLoop:
 	CALL user_login
 	
-	
 menuLoop:
-    CALL user_Menu    ; Call the user menu function
 	
-	CALL clear_Screen
+    CALL user_Menu    ; Call the user menu function
 	
     ; Go To Choice
     CMP choice, 1
@@ -42,10 +55,9 @@ menuLoop:
     JE searchStock
     CMP choice, 4
     JE generateReport
-    CMP choice, 5
-    JE exitProgram
-
 	
+    JMP exitProgram
+
 stockIn:
     ; Code for Stock In
 	MOV AH,09H
@@ -72,22 +84,48 @@ stockOut:
 
 searchStock:
     ; Code for Search Stock
-	searchLoop:
-	call searchPhoneStock
+	searchStockLoop:
+		MOV numStockFound, 0
+		CALL searchMenu
 		
-	CALL cmpString
-	
-	CALL continueSearch
-	
-	CMP choice, 1
-	JE searchLoop
-	CMP choice, 2
-	JE menuLoop
-	CMP choice, 3
-	JE menuLoop		
-	
-	call clear_Screen
+		CMP choice, 2
+		JE menuLoop
+		
+		call clear_Screen 
+		
+		CALL openReadStockFile
+		MOV searchCheck, 0
+		CALL searchPhoneStock
+		JMP compareStringLoop
 
+	
+	compareStringLoop:
+		CALL readStockDetails
+
+		MOV searchCheck, 0
+		CALL cmpString
+		CMP searchCheck, 1
+		JE displayResult
+
+		MOV AX, [SI]
+		CMP AX, 0
+		JE EndDisplayResult
+		
+		JMP compareStringLoop
+	
+	displayResult:
+		INC numStockFound
+		CALL displayStockDetails
+		
+		MOV AX, [SI]
+		CMP AX, 0
+		JE EndDisplayResult
+		
+		JMP compareStringLoop
+		
+	EndDisplayResult:
+		CALL closeStockFile
+		JMP searchStockLoop
 generateReport:
     ; Code for Generate Report
 	
@@ -104,7 +142,6 @@ generateReport:
     JMP menuLoop
 
 exitProgram:
-
 	MOV AH,09H
     LEA DX, MSG5
     INT 21H
