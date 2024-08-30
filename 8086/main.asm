@@ -126,6 +126,7 @@ searchStock:
 	EndDisplayResult:
 		CALL closeStockFile
 		JMP searchStockLoop
+		
 generateReport:
     ; Code for Generate Report
 	
