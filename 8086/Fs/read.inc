@@ -89,6 +89,57 @@ endReadString:
 
 readStringFromFile ENDP
 	
+;---------------------------------------
+;	readStockPrice
+;	read the price from the file
+;---------------------------------------
+readStockPrice PROC
+	MOV AX, 0
+	MOV BX, 0
+	MOV BL, [SI]
+	SUB BL, 30H
+	MOV Stock.phonePrice, BX
+	INC SI
+continueReadPrice:
+	MOV BL, [SI]
+	CMP BL, '.'
+	JE readStockPriceFP	;continue read floating point
+	
+	MOV AX, Stock.phonePrice
+	MUL ten8Bits
+	SUB BL, 30H
+	ADD BX, AX
+	MOV Stock.phonePrice, AX
+	INC SI
+	
+	JMP continueReadPrice
+
+readStockPriceFP:
+	MOV AX, 0
+	MOV BX, 0
+	MOV BL, [SI]
+	SUB BL, 30H
+	MOV Stock.phonePriceFP, BX
+	INC SI
+continueReadPriceFP:
+	MOV BL, [SI]
+	CMP BL, ';'
+	JE endReadPrice	;continue read floating point
+	
+	MOV AX, Stock.phonePriceFP
+	MUL ten8Bits
+	SUB BL, 30H
+	ADD BX, AX
+	MOV Stock.phonePriceFP, AX
+	INC SI
+	
+	JMP continueReadPrice
+	
+endReadPrice:
+	INC SI
+	RET
+	
+readStockPrice ENDP
 
 
 ;---------------------------------------
@@ -111,6 +162,7 @@ readStockDetails PROC
 	LEA DI, Stock.phoneColor
 	MOV CX, 10
 	CALL readStringFromFile
+
 	
 	CALL jumpToNextLine
 	

@@ -1,6 +1,7 @@
 .MODEL SMALL
 .STACK 100
 .DATA 
+	ten8Bits DB 10
     choice DB ?
 	searchCheck DB 0
 	numStockFound DB 0
@@ -19,8 +20,9 @@
 		phoneRAM DB 20 DUP('$')
 		phoneROM DB 20 DUP('$')
 		phoneColor DB 20 DUP('$')
-		phonePrice DB ?
-		phonePriceFP DB ?
+		phonePrice DW 1234
+		phonePriceFP DW 50
+		phoneQty DW ?
 	phone ENDS
 	
 	Stock phone<>
@@ -31,6 +33,7 @@
 INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
+INCLUDE Fs\display.inc
 INCLUDE Simon\clnScr.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\report.inc
