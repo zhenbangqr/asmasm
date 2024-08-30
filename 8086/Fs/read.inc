@@ -163,6 +163,7 @@ readStockDetails PROC
 	MOV CX, 10
 	CALL readStringFromFile
 
+	CALL readStockPrice
 	
 	CALL jumpToNextLine
 	
