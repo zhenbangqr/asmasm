@@ -34,7 +34,7 @@ INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
-INCLUDE Simon\clnScr.inc
+INCLUDE Simon\utils.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\report.inc
 
