@@ -13,11 +13,11 @@
 	digitCount DB ?
 	
 	; Example for phone details
-	phoneName DB "Tiong Fatt Siong    $"
-	phoneRam DB "8GB     $"
-	phoneRom DB "128GB   $"
-	phoneColor DB "White   $"
-	stockInQty DW 10
+	phoneNameee DB "Tiong Fatt Siong    $"
+	phoneRammm DB "8GB     $"
+	phoneRommm DB "128GB   $"
+	phoneColorrr DB "White   $"
+	stockInQtyyy DW 10
 	
 	; Divider
 	tenThousand DW 10000
@@ -203,31 +203,31 @@ invStatReports ENDP
 displayDetails PROC
 	
 	MOV AH,09H
-	LEA DX,phoneName
+	LEA DX,phoneNameee
 	INT 21H
 	
 	CALL delimiter
 	
 	MOV AH,09H
-	LEA DX,phoneRam
+	LEA DX,phoneRammm
 	INT 21H
 	
 	CALL delimiter
 	
 	MOV AH,09H
-	LEA DX,phoneRom
+	LEA DX,phoneRommm
 	INT 21H
 	
 	CALL delimiter
 	
 	MOV AH,09H
-	LEA DX,phoneColor
+	LEA DX,phoneColorrr
 	INT 21H
 	
 	CALL delimiter
 	
 	MOV AH,02H
-	MOV AX,stockInQty
+	MOV AX,stockInQtyyy
 	CALL displayNumber
 	
 	MOV AH,09H
