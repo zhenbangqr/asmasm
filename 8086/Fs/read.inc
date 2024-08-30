@@ -65,19 +65,26 @@ exitReadFile:
 ;	Read a string from file to a holder
 ;-----------------------------------------
 readStringFromFile PROC
-
+	PUSH CX
 continueReadString:
 	MOV AL, [SI]
 	CMP AL, ';'
-	JE endReadString
+	JE loopFillSpace
 	MOV [DI], AL 
+	DEC CX
 	INC SI
 	INC DI
 	JMP continueReadString
 	
+loopFillSpace:
+	MOV AL, ' '
+	MOV [DI], AL
+	INC DI
+LOOP loopFillSpace
+	
 endReadString:
-	MOV BYTE PTR [DI], '$'
 	INC SI
+	POP CX
 	RET
 
 readStringFromFile ENDP
@@ -90,15 +97,19 @@ readStringFromFile ENDP
 ;---------------------------------------
 readStockDetails PROC
 	LEA DI, Stock.phoneName
+	MOV CX, 15
 	CALL readStringFromFile
 
 	LEA DI, Stock.phoneRAM
+	MOV CX, 10
 	CALL readStringFromFile
 	
 	LEA DI, Stock.phoneROM
+	MOV CX, 10
 	CALL readStringFromFile
 	
 	LEA DI, Stock.phoneColor
+	MOV CX, 10
 	CALL readStringFromFile
 	
 	CALL jumpToNextLine

@@ -15,10 +15,10 @@
 	MSG5 db "EXIT$"
 
 	phone STRUC
-		phoneName DB 15 DUP(?)
-		phoneRAM DB 15 DUP(?)
-		phoneROM DB 15 DUP(?)
-		phoneColor DB 15 DUP(?)
+		phoneName DB 20 DUP('$')
+		phoneRAM DB 20 DUP('$')
+		phoneROM DB 20 DUP('$')
+		phoneColor DB 20 DUP('$')
 		phonePrice DB ?
 		phonePriceFP DB ?
 	phone ENDS
