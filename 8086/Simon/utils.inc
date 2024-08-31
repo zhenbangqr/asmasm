@@ -62,4 +62,29 @@ print_newLine MACRO
 
 ENDM
 	
+;--Macro to print divider
+displayDivider MACRO
 	
+	MOV AH,09H
+	LEA DX,divider
+	INT 21H
+	
+ENDM
+
+;--Macro to print delimiter
+delimiter MACRO
+	
+	MOV AH,02H
+	MOV DL,"|"
+	INT 21H
+	
+ENDM
+
+;--Macro to pause the screen
+pause MACRO
+	
+	MOV AH,01H
+    INT 21H
+	
+ENDM
+

@@ -29,13 +29,13 @@
 reportMenu PROC
 	
 	reportList:
-		CALL displayDivider
+		displayDivider
 		
 		MOV AH,09H
 		LEA DX,reportTitle
 		INT 21H
 		
-		CALL displayDivider
+		displayDivider
 		
 		MOV AH,09H
 		LEA DX,reportChoice
@@ -56,9 +56,7 @@ reportMenu PROC
 		
 		MOV choice,AL
 		
-		MOV AH,09H
-		LEA DX,newLine
-		INT 21H
+		print_newLine
 		
 		CMP choice,1
 		JE stockInReport
@@ -71,61 +69,57 @@ reportMenu PROC
 	
 	reportInvalidChoice:
 	
-		CALL clear_Screen
+		clnScr
 				
-		MOV AH,09H
-		LEA DX,newLine
-		INT 21H
+		print_newLine
 		
 		MOV AH,09H
 		LEA DX,invalidInputMsg
 		INT 21H
 	
-		MOV AH,09H
-		LEA DX,newLine
-		INT 21H
+		print_newLine
 	
 		JMP reportList
 
 	stockInReport:
 	
-		CALL clear_Screen
+		clnScr
 		CALL stockInReports
-		CALL pause
-		CALL clear_Screen
+		pause
+		clnScr
 	
 		JMP reportList
 
 	stockOutReport:
 	
-		CALL clear_Screen
+		clnScr
 		CALL stockOutReports
-		CALL pause
-		CALL clear_Screen
+		pause
+		clnScr
 	
 		JMP reportList
 
 	invStatReport:
 	
-		CALL clear_Screen
-		CALL invStatReports
-		CALL pause
-		CALL clear_Screen
+		clnScr
+		JMP jmpSkip
+		pause
+		clnScr
 	
 		JMP reportList
 	
 reportMenu ENDP
 
-; Display stock in
-stockInReports PROC
+; Display current stock status
+invStatReports PROC
 
-	CALL displayDivider
+	displayDivider
 	
 	MOV AH,09H
-	LEA DX,stockInTitle
+	LEA DX,invStatTitle
 	INT 21H
 	
-	CALL displayDivider
+	displayDivider
 	
 	MOV AH,09H
 	LEA DX,phoneDetailsTitle
@@ -138,7 +132,35 @@ stockInReports PROC
 	; Here need to do loop to display all phone details
 	CALL displayDetails
 	
-	CALL displayDivider
+	displayDivider
+	
+	RET
+	
+invStatReports ENDP
+
+; Display stock in
+stockInReports PROC
+
+	displayDivider
+	
+	MOV AH,09H
+	LEA DX,stockInTitle
+	INT 21H
+	
+	displayDivider
+	
+	MOV AH,09H
+	LEA DX,phoneDetailsTitle
+	INT 21H
+	
+	MOV AH,09H
+	LEA DX,phoneDetailsTitleDivider
+	INT 21H
+	
+	; Here need to do loop to display all phone details
+	CALL displayDetails
+	
+	displayDivider
 	
 	RET
 	
@@ -147,13 +169,13 @@ stockInReports ENDP
 ; Display stock out
 stockOutReports PROC
 
-	CALL displayDivider
+	displayDivider
 	
 	MOV AH,09H
 	LEA DX,stockOutTitle
 	INT 21H
 	
-	CALL displayDivider
+	displayDivider
 	
 	MOV AH,09H
 	LEA DX,phoneDetailsTitle
@@ -166,39 +188,11 @@ stockOutReports PROC
 	; Here need to do loop to display all phone details
 	CALL displayDetails
 	
-	CALL displayDivider
+	displayDivider
 	
 	RET
 	
 stockOutReports ENDP
-
-; Display current stock status
-invStatReports PROC
-
-	CALL displayDivider
-	
-	MOV AH,09H
-	LEA DX,invStatTitle
-	INT 21H
-	
-	CALL displayDivider
-	
-	MOV AH,09H
-	LEA DX,phoneDetailsTitle
-	INT 21H
-	
-	MOV AH,09H
-	LEA DX,phoneDetailsTitleDivider
-	INT 21H
-	
-	; Here need to do loop to display all phone details
-	CALL displayDetails
-	
-	CALL displayDivider
-	
-	RET
-	
-invStatReports ENDP
 
 displayDetails PROC
 	
@@ -206,63 +200,32 @@ displayDetails PROC
 	LEA DX,phoneNameee
 	INT 21H
 	
-	CALL delimiter
+	delimiter
 	
 	MOV AH,09H
 	LEA DX,phoneRammm
 	INT 21H
 	
-	CALL delimiter
+	delimiter
 	
 	MOV AH,09H
 	LEA DX,phoneRommm
 	INT 21H
 	
-	CALL delimiter
+	delimiter
 	
 	MOV AH,09H
 	LEA DX,phoneColorrr
 	INT 21H
 	
-	CALL delimiter
+	delimiter
 	
 	MOV AH,02H
 	MOV AX,stockInQtyyy
 	CALL displayNumber
 	
-	MOV AH,09H
-	LEA DX,newLine
-	INT 21H
+	print_newLine
 	
 	RET
 	
 displayDetails ENDP
-
-
-
-displayDivider PROC
-	
-	MOV AH,09H
-	LEA DX,divider
-	INT 21H
-	
-	RET
-	
-displayDivider ENDP
-
-delimiter PROC
-
-	MOV AH,02H
-	MOV DL,"|"
-	INT 21H
-	RET
-	
-delimiter ENDP
-
-pause PROC
-
-    MOV AH,01H
-    INT 21H
-    RET
-	
-pause ENDP
