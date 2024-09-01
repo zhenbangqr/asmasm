@@ -65,7 +65,6 @@ exitReadFile:
 ;	Read a string from file to a holder
 ;-----------------------------------------
 readStringFromFile PROC
-	PUSH CX
 continueReadString:
 	MOV AL, [SI]
 	CMP AL, ';'
@@ -84,7 +83,6 @@ LOOP loopFillSpace
 	
 endReadString:
 	INC SI
-	POP CX
 	RET
 
 readStringFromFile ENDP
@@ -98,44 +96,24 @@ readStockPrice PROC
 	MOV BX, 0
 	MOV BL, [SI]
 	SUB BL, 30H
-	MOV Stock.phonePrice, BX
+	
+	MOV AX, BX
 	INC SI
 continueReadPrice:
 	MOV BL, [SI]
 	CMP BL, '.'
-	JE readStockPriceFP	;continue read floating point
-	
-	MOV AX, Stock.phonePrice
-	MUL ten8Bits
-	SUB BL, 30H
-	ADD BX, AX
-	MOV Stock.phonePrice, AX
-	INC SI
-	
-	JMP continueReadPrice
-
-readStockPriceFP:
-	MOV AX, 0
-	MOV BX, 0
-	MOV BL, [SI]
-	SUB BL, 30H
-	MOV Stock.phonePriceFP, BX
-	INC SI
-continueReadPriceFP:
-	MOV BL, [SI]
-	CMP BL, ';'
 	JE endReadPrice	;continue read floating point
 	
-	MOV AX, Stock.phonePriceFP
-	MUL ten8Bits
+	MUL ten16Bits
 	SUB BL, 30H
-	ADD BX, AX
-	MOV Stock.phonePriceFP, AX
+	ADD AX, BX
+	
 	INC SI
-	
 	JMP continueReadPrice
-	
 endReadPrice:
+	MOV WORD PTR [Stock.phonePrice], AX
+	MOV WORD PTR [Stock.phonePrice + 2], 0
+
 	INC SI
 	RET
 	
@@ -162,7 +140,7 @@ readStockDetails PROC
 	LEA DI, Stock.phoneColor
 	MOV CX, 10
 	CALL readStringFromFile
-
+	
 	CALL readStockPrice
 	
 	CALL jumpToNextLine

@@ -32,7 +32,8 @@ displayStockDetails PROC
 	LEA DX, Stock.phoneColor
 	INT 21H
 	
-	MOV BX, Phone.phonePrice
+	MOV AX, WORD PTR Stock.phonePrice
+	MOV DX, WORD PTR Stock.phonePrice + 2
 	CALL displayNumber
 	
 	
@@ -44,20 +45,14 @@ displayStockDetails PROC
 displayStockDetails ENDP
 
 
-
 displayNumber PROC
-	MOV AX, Stock.phonePrice
 	MOV CX, 0
-
 displayNumberLoop:
-	DIV ten8Bits
-	MOV numberHolder, AL
-	MOV AL, AH
-	MOV AH, 0
-	PUSH AX
-	MOV AL, numberHolder
+	DIV ten16Bits
+	PUSH DX
 	INC CX
-	CMP AL, 0
+	MOV DX, 0000H
+	CMP AX, DX
 	JNE displayNumberLoop
 
 printNumber:
@@ -67,8 +62,5 @@ printNumber:
 	ADD DL, 30H
 	INT 21H
 LOOP printNumber
-
-
 	RET
-
 displayNumber ENDP

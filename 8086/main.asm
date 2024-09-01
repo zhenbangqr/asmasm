@@ -2,6 +2,7 @@
 .STACK 100
 .DATA 
 	ten8Bits DB 10
+	ten16Bits DW 10
     choice DB ?
 	searchCheck DB 0
 	numStockFound DB 0
@@ -30,14 +31,13 @@
 .CODE
 
 ;-- INCLUDE the menu file
+INCLUDE Simon\utils.inc
 INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
-INCLUDE Simon\utils.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\report.inc
-INCLUDE zb\stokin.inc
 
 MAIN PROC 
     MOV AX,@DATA
@@ -95,8 +95,6 @@ searchStock:
 		CMP choice, 2
 		JE menuLoop
 		
-		call clear_Screen 
-		
 		CALL openReadStockFile
 		MOV searchCheck, 0
 		CALL searchPhoneStock
@@ -141,8 +139,6 @@ generateReport:
 	MOV AH, 09H
     LEA DX, newLine
     INT 21H
-	
-	CALL reportMenu
 	
     JMP menuLoop
 

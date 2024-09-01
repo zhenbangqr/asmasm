@@ -1,3 +1,7 @@
+.DATA
+	divider db "==========================================================$"
+
+
 ;------------
 ;This file defines multiple MACROS to reduce code repetitions 
 
