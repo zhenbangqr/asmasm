@@ -34,6 +34,7 @@ INCLUDE Fs\read.inc
 INCLUDE Simon\clnScr.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\report.inc
+INCLUDE zb\stokin.inc
 
 MAIN PROC 
     MOV AX,@DATA
@@ -126,6 +127,7 @@ searchStock:
 	EndDisplayResult:
 		CALL closeStockFile
 		JMP searchStockLoop
+		
 generateReport:
     ; Code for Generate Report
 	
