@@ -21,9 +21,9 @@
 		phoneRAM DB 20 DUP('$')
 		phoneROM DB 20 DUP('$')
 		phoneColor DB 20 DUP('$')
-		phonePrice DW 1234
-		phonePriceFP DW 50
-		phoneQty DW ?
+		phonePrice DD ?
+		phonePriceFP DD ?
+		phoneQty DD ?
 	phone ENDS
 	
 	Stock phone<>
@@ -117,11 +117,19 @@ searchStock:
 	
 	displayResult:
 		INC numStockFound
+		
+		CMP numStockFound, 1
+		JNE skipDisplaySearchTitle
+		CALL displaySearchTitle
+
+	skipDisplaySearchTitle:
 		CALL displayStockDetails
 		
 		MOV AX, [SI]
 		CMP AX, 0
 		JE EndDisplayResult
+		
+		
 		
 		JMP compareStringLoop
 		

@@ -94,6 +94,7 @@ readStringFromFile ENDP
 readStockPrice PROC
 	MOV AX, 0
 	MOV BX, 0
+	
 	MOV BL, [SI]
 	SUB BL, 30H
 	
@@ -102,22 +103,86 @@ readStockPrice PROC
 continueReadPrice:
 	MOV BL, [SI]
 	CMP BL, '.'
-	JE endReadPrice	;continue read floating point
+	JE endReadPrice
 	
 	MUL ten16Bits
 	SUB BL, 30H
 	ADD AX, BX
 	
 	INC SI
+	
 	JMP continueReadPrice
 endReadPrice:
-	MOV WORD PTR [Stock.phonePrice], AX
-	MOV WORD PTR [Stock.phonePrice + 2], 0
+	MOV WORD PTR Stock.phonePrice, AX
+	MOV WORD PTR Stock.phonePrice + 2, DX
+
+	INC SI
+	
+	JMP readPriceFP
+
+readPriceFP:
+	MOV AX, 0
+	MOV BX, 0
+	
+	MOV BL, [SI]
+	SUB BL, 30H
+	
+	MOV AX, BX
+	INC SI
+	
+continueReadPriceFP:
+	MOV BL, [SI]
+	CMP BL, ';'
+	JE endReadPriceFP
+	
+	MUL ten16Bits
+	SUB BL, 30H
+	ADD AX, BX
+	
+	INC SI
+	
+	JMP continueReadPriceFP
+endReadPriceFP:
+	MOV WORD PTR Stock.phonePriceFP, AX
+	MOV WORD PTR Stock.phonePriceFP + 2, DX
 
 	INC SI
 	RET
 	
 readStockPrice ENDP
+
+;----------------------------------------
+;	readNumber
+;	read the number from file
+;----------------------------------------
+readNumber PROC
+	MOV AX, 0
+	MOV BX, 0
+	
+	MOV BL, [SI]
+	SUB BL, 30H
+	
+	MOV AX, BX
+	INC SI
+	
+continueReadNumber:
+	MOV BL, [SI]
+	CMP BL, ';'
+	JE endReadNumber
+	
+	MUL ten16Bits
+	SUB BL, 30H
+	ADD AX, BX
+	
+	INC SI
+	
+	JMP continueReadNumber
+
+endReadNumber:
+	INC SI
+	RET
+
+readNumber ENDP
 
 
 ;---------------------------------------
@@ -142,6 +207,11 @@ readStockDetails PROC
 	CALL readStringFromFile
 	
 	CALL readStockPrice
+	
+	CALL readNumber
+	MOV WORD PTR [Stock.phoneQty], AX
+	MOV WORD PTR [Stock.phoneQty + 2], DX
+
 	
 	CALL jumpToNextLine
 	
