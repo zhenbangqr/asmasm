@@ -37,6 +37,7 @@ INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
 INCLUDE Simon\login.inc
+INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
 
 MAIN PROC 
@@ -132,13 +133,7 @@ searchStock:
 generateReport:
     ; Code for Generate Report
 	
-	MOV AH,09H
-    LEA DX, MSG4
-    INT 21H
-	
-	MOV AH, 09H
-    LEA DX, newLine
-    INT 21H
+	CALL reportMenu
 	
     JMP menuLoop
 
