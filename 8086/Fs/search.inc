@@ -121,41 +121,6 @@ finish:
 cmpString ENDP
 
 
-;-----------------------------------------
-;	displayStockDetails
-;	display the Stock Details
-;-----------------------------------------
-displayStockDetails PROC
-	MOV AH, 02H
-	MOV DL, numStockFound
-	ADD DL, 30H
-	INT 21H
 
-	MOV AH, 02H
-	MOV DL, '.'
-	INT 21H
-	
-	MOV AH, 09H
-	LEA DX, Stock.phoneName
-	INT 21H
-	
-	MOV AH, 09H
-	LEA DX, Stock.phoneRAM
-	INT 21H
-	
-	MOV AH, 09H
-	LEA DX, Stock.phoneROM
-	INT 21H
-	
-	MOV AH, 09H
-	LEA DX, Stock.phoneColor
-	INT 21H
-	
-	MOV AH, 09H
-	LEA DX, newLine
-	INT 21H
-	
-	RET
-displayStockDetails ENDP
 	
 	
