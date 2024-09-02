@@ -43,8 +43,6 @@ choiceLoop:
 	RET 
     
 invalidChoice:
-	CALL clear_Screen 
-	
     MOV AH, 09H
     LEA DX, invalidInputMsg
     INT 21H

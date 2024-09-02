@@ -2,6 +2,7 @@
 .STACK 100
 .DATA 
 	ten8Bits DB 10
+	ten16Bits DW 10
     choice DB ?
 	searchCheck DB 0
 	numStockFound DB 0
@@ -20,9 +21,9 @@
 		phoneRAM DB 20 DUP('$')
 		phoneROM DB 20 DUP('$')
 		phoneColor DB 20 DUP('$')
-		phonePrice DW 1234
-		phonePriceFP DW 50
-		phoneQty DW ?
+		phonePrice DD ?
+		phonePriceFP DD ?
+		phoneQty DD ?
 	phone ENDS
 	
 	Stock phone<>
@@ -30,14 +31,14 @@
 .CODE
 
 ;-- INCLUDE the menu file
+INCLUDE Simon\utils.inc
 INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
-INCLUDE Simon\utils.inc
 INCLUDE Simon\login.inc
+INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
-INCLUDE zb\stokin.inc
 
 MAIN PROC 
     MOV AX,@DATA
@@ -95,8 +96,6 @@ searchStock:
 		CMP choice, 2
 		JE menuLoop
 		
-		call clear_Screen 
-		
 		CALL openReadStockFile
 		MOV searchCheck, 0
 		CALL searchPhoneStock
@@ -119,11 +118,19 @@ searchStock:
 	
 	displayResult:
 		INC numStockFound
+		
+		CMP numStockFound, 1
+		JNE skipDisplaySearchTitle
+		CALL displaySearchTitle
+
+	skipDisplaySearchTitle:
 		CALL displayStockDetails
 		
 		MOV AX, [SI]
 		CMP AX, 0
 		JE EndDisplayResult
+		
+		
 		
 		JMP compareStringLoop
 		
@@ -133,14 +140,6 @@ searchStock:
 		
 generateReport:
     ; Code for Generate Report
-	
-	MOV AH,09H
-    LEA DX, MSG4
-    INT 21H
-	
-	MOV AH, 09H
-    LEA DX, newLine
-    INT 21H
 	
 	CALL reportMenu
 	

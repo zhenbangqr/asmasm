@@ -1,7 +1,5 @@
 .DATA
-
-	divider DB "==========================================================", 0DH, 0AH, "$"
-	reportTitle DB "==                        Report                        ==", 0DH, 0AH, "$"
+	reportTitle DB "==                        Report                         ==", 0DH, 0AH, "$"
 	reportChoice DB "1. Monthly Stock In Report", 0DH, 0AH, "2. Monthly Stock Out Report", 0DH, 0AH, "3. Inventory Status Report", 0DH, 0AH, "4. Return", 0DH, 0AH, "$"
 	promptReportChoice DB "Enter a digit(1-4): $"
 	
@@ -10,6 +8,7 @@
 reportMenu PROC
 	
 	reportList:
+		clnScr
 		displayDivider
 		
 		MOV AH,09H
@@ -42,7 +41,7 @@ reportMenu PROC
 	reportInvalidChoice:
 	
 		clnScr
-				
+		
 		print_Newline
 		
 		MOV AH,09H
@@ -60,6 +59,8 @@ reportMenu PROC
 		JE stockOutReport
 		CMP choice,3
 		JE invStatReport
+		
+		clnScr
 		JMP repMenuEnd
 	
 	stockInReport:
@@ -67,7 +68,6 @@ reportMenu PROC
 		clnScr
 		CALL stockInReports
 		pause
-		clnScr
 	
 		JMP reportList
 
@@ -76,7 +76,6 @@ reportMenu PROC
 		clnScr
 		CALL stockOutReports
 		pause
-		clnScr
 	
 		JMP reportList
 	
@@ -85,7 +84,6 @@ reportMenu PROC
 		clnScr
 		CALL invStatReports
 		pause
-		clnScr
 	
 		JMP reportList
 	

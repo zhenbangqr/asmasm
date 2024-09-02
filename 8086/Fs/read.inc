@@ -65,7 +65,6 @@ exitReadFile:
 ;	Read a string from file to a holder
 ;-----------------------------------------
 readStringFromFile PROC
-	PUSH CX
 continueReadString:
 	MOV AL, [SI]
 	CMP AL, ';'
@@ -84,7 +83,6 @@ LOOP loopFillSpace
 	
 endReadString:
 	INC SI
-	POP CX
 	RET
 
 readStringFromFile ENDP
@@ -96,50 +94,95 @@ readStringFromFile ENDP
 readStockPrice PROC
 	MOV AX, 0
 	MOV BX, 0
+	
 	MOV BL, [SI]
 	SUB BL, 30H
-	MOV Stock.phonePrice, BX
+	
+	MOV AX, BX
 	INC SI
 continueReadPrice:
 	MOV BL, [SI]
 	CMP BL, '.'
-	JE readStockPriceFP	;continue read floating point
+	JE endReadPrice
 	
-	MOV AX, Stock.phonePrice
-	MUL ten8Bits
+	MUL ten16Bits
 	SUB BL, 30H
-	ADD BX, AX
-	MOV Stock.phonePrice, AX
+	ADD AX, BX
+	
 	INC SI
 	
 	JMP continueReadPrice
+endReadPrice:
+	MOV WORD PTR Stock.phonePrice, AX
+	MOV WORD PTR Stock.phonePrice + 2, DX
 
-readStockPriceFP:
+	INC SI
+	
+	JMP readPriceFP
+
+readPriceFP:
 	MOV AX, 0
 	MOV BX, 0
+	
 	MOV BL, [SI]
 	SUB BL, 30H
-	MOV Stock.phonePriceFP, BX
+	
+	MOV AX, BX
 	INC SI
+	
 continueReadPriceFP:
 	MOV BL, [SI]
 	CMP BL, ';'
-	JE endReadPrice	;continue read floating point
+	JE endReadPriceFP
 	
-	MOV AX, Stock.phonePriceFP
-	MUL ten8Bits
+	MUL ten16Bits
 	SUB BL, 30H
-	ADD BX, AX
-	MOV Stock.phonePriceFP, AX
+	ADD AX, BX
+	
 	INC SI
 	
-	JMP continueReadPrice
-	
-endReadPrice:
+	JMP continueReadPriceFP
+endReadPriceFP:
+	MOV WORD PTR Stock.phonePriceFP, AX
+	MOV WORD PTR Stock.phonePriceFP + 2, DX
+
 	INC SI
 	RET
 	
 readStockPrice ENDP
+
+;----------------------------------------
+;	readNumber
+;	read the number from file
+;----------------------------------------
+readNumber PROC
+	MOV AX, 0
+	MOV BX, 0
+	
+	MOV BL, [SI]
+	SUB BL, 30H
+	
+	MOV AX, BX
+	INC SI
+	
+continueReadNumber:
+	MOV BL, [SI]
+	CMP BL, ';'
+	JE endReadNumber
+	
+	MUL ten16Bits
+	SUB BL, 30H
+	ADD AX, BX
+	
+	INC SI
+	
+	JMP continueReadNumber
+
+endReadNumber:
+	INC SI
+	RET
+
+readNumber ENDP
 
 
 ;---------------------------------------
@@ -162,8 +205,13 @@ readStockDetails PROC
 	LEA DI, Stock.phoneColor
 	MOV CX, 10
 	CALL readStringFromFile
-
+	
 	CALL readStockPrice
+	
+	CALL readNumber
+	MOV WORD PTR [Stock.phoneQty], AX
+	MOV WORD PTR [Stock.phoneQty + 2], DX
+
 	
 	CALL jumpToNextLine
 	

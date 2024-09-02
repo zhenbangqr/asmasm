@@ -106,9 +106,8 @@ compare:
 		INC DI
 	LOOP compareLoop
 	
-	MOV AH, 09H
 	MOV searchCheck, 1
-	INT 21H
+
 	JMP finish
 
 failCompare:

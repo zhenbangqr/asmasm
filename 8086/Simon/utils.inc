@@ -1,3 +1,7 @@
+.DATA
+	divider db "=============================================================================$"
+
+
 ;------------
 ;This file defines multiple MACROS to reduce code repetitions 
 
@@ -84,6 +88,15 @@ ENDM
 pause MACRO
 	
 	MOV AH,01H
+    INT 21H
+	
+ENDM
+
+;--Macro to pause the screen
+space MACRO
+	
+	MOV AH, 02H
+	MOV DL, ' '
     INT 21H
 	
 ENDM
