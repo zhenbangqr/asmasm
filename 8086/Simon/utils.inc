@@ -75,6 +75,14 @@ displayDivider MACRO
 	
 ENDM
 
+reportDivider MACRO
+
+	MOV AH,09H
+	LEA DX,repDivider
+	INT 21H
+	
+ENDM
+
 ;--Macro to print delimiter
 delimiter MACRO
 	
