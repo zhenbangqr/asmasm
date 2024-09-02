@@ -23,17 +23,26 @@ displaySearchTitle ENDP
 ;	displayStockDetails
 ;	display the Stock Details
 ;-----------------------------------------
-displayStockDetails PROC	
+displayStockDetails PROC
+	MOV AX, 0
+	MOV AL, numStockFound
+	DIV ten8Bits
+	
+	MOV BX, AX
 	MOV AH, 02H
-	MOV DL, numStockFound
+	MOV DL, BL
+	ADD DL, 30H
+	INT 21H
+	
+	MOV AH, 02H
+	MOV DL, BH
 	ADD DL, 30H
 	INT 21H
 
 	MOV AH, 02H
 	MOV DL, '.'
 	INT 21H
-	
-	space
+
 	space
 	
 	MOV AH, 09H
