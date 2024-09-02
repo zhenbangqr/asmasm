@@ -1,6 +1,6 @@
 .DATA
     filename DB 'Phone.txt', 0
-    buffer DB 512 DUP(?)    ; Buffer to store file content
+    buffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
 	fileErrorMsg DB "Error Occured!$"
 .code
@@ -20,7 +20,7 @@ openReadStockFile PROC
 	
 	MOV BX, fileHandle		;Use the fileHandle
 	LEA DX, buffer			;Address for buffer
-	MOV CX, 512				;Read 128 bytes
+	MOV CX, 1024			;Read 1024 bytes
 	MOV AH, 3FH				;Read File
 	INT 21H
 	JC fileError			;Jump when carry flag set(error when open file)
@@ -156,8 +156,10 @@ readStockPrice ENDP
 ;	read the number from file
 ;----------------------------------------
 readNumber PROC
-	MOV AX, 0
-	MOV BX, 0
+	resetAX
+	resetBX
+	resetCX
+	resetDX
 	
 	MOV BL, [SI]
 	SUB BL, 30H
@@ -211,6 +213,14 @@ readStockDetails PROC
 	CALL readNumber
 	MOV WORD PTR [Stock.phoneQty], AX
 	MOV WORD PTR [Stock.phoneQty + 2], DX
+	
+	CALL readNumber
+	MOV WORD PTR [Stock.totalStockInQty], AX
+	MOV WORD PTR [Stock.totalStockInQty + 2], DX
+	
+	CALL readNumber
+	MOV WORD PTR [Stock.totalStockOutQty], AX
+	MOV WORD PTR [Stock.totalStockOutQty + 2], DX
 
 	
 	CALL jumpToNextLine

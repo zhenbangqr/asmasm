@@ -84,6 +84,7 @@ searchPhoneStock ENDP
 ;	compare the string read from file with the entered string
 ;--------------------------------------------------------------
 cmpString PROC
+	MOV searchCheck, 0
 	MOV arrNum, 0
 	MOV BX, 0
 	JMP compare

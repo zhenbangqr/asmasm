@@ -24,6 +24,8 @@
 		phonePrice DD ?
 		phonePriceFP DD ?
 		phoneQty DD ?
+		totalStockInQty DD ?
+		totalStockOutQty DD ?
 	phone ENDS
 	
 	Stock phone<>
@@ -87,6 +89,12 @@ stockOut:
 	
     JMP menuLoop
 
+generateReport:
+    ; Code for Generate Report
+	CALL reportMenu
+	
+    JMP menuLoop
+
 searchStock:
     ; Code for Search Stock
 	searchStockLoop:
@@ -97,7 +105,7 @@ searchStock:
 		JE menuLoop
 		
 		CALL openReadStockFile
-		MOV searchCheck, 0
+		CALL jumpToNextLine			;Skip the file title
 		CALL searchPhoneStock
 		JMP compareStringLoop
 
@@ -105,14 +113,13 @@ searchStock:
 	compareStringLoop:
 		CALL readStockDetails
 
-		MOV searchCheck, 0
 		CALL cmpString
 		CMP searchCheck, 1
 		JE displayResult
 
 		MOV AX, [SI]
 		CMP AX, 0
-		JE EndDisplayResult
+		JE checkSearchResultEqlZero
 		
 		JMP compareStringLoop
 	
@@ -128,23 +135,25 @@ searchStock:
 		
 		MOV AX, [SI]
 		CMP AX, 0
-		JE EndDisplayResult
-		
-		
+		JE checkSearchResultEqlZero
 		
 		JMP compareStringLoop
+	
+	checkSearchResultEqlZero:
+		CMP numStockFound, 0
+		JE DisplayNotFoundMsg
+		displayDivider
+		JMP EndDisplayResult
 		
+	DisplayNotFoundMsg:
+		MOV AH, 09H
+		LEA DX, searchFailMsg
+		INT 21H
+	
 	EndDisplayResult:
 		CALL closeStockFile
 		JMP searchStockLoop
 		
-generateReport:
-    ; Code for Generate Report
-	
-	CALL reportMenu
-	
-    JMP menuLoop
-
 exitProgram:
 	MOV AH,09H
     LEA DX, MSG5
