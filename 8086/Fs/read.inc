@@ -1,9 +1,38 @@
 .DATA
-    filename DB 'Phone.txt', 0
+    stockFileName DB 'Phone.txt', 0
+    staffFileName DB 'staff.txt', 0
     buffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
 	fileErrorMsg DB "Error Occured!$"
+	fillSpaceBool DW ? 	;1=yes, 2=no
 .code
+
+;--------------------------------------------
+;	openReadStockFile
+;	open the stock file(Phone.txt) for read
+;--------------------------------------------
+openReadStaffFile PROC
+
+	MOV AH, 3DH					;Open file
+	MOV AL, 0					;Open for reading
+	MOV DX, OFFSET staffFileName
+	INT 21H
+	JC fileError				;Jump when carry flag set(error when open file)
+	mov fileHandle, AX			;Store File Handle
+	
+	MOV BX, fileHandle			;Use the fileHandle
+	LEA DX, buffer				;Address for buffer
+	MOV CX, 1024				;Read 1024 bytes
+	MOV AH, 3FH					;Read File
+	INT 21H
+	JC fileError				;Jump when carry flag set(error when open file)
+	
+	LEA SI, buffer
+	
+	RET
+
+openReadStaffFile ENDP
+
 
 ;--------------------------------------------
 ;	openReadStockFile
@@ -11,19 +40,19 @@
 ;--------------------------------------------
 openReadStockFile PROC
 
-	MOV AH, 3DH				;Open file
-	MOV AL, 0				;Open for reading
-	MOV DX, OFFSET filename	;
+	MOV AH, 3DH					;Open file
+	MOV AL, 0					;Open for reading
+	MOV DX, OFFSET stockFileName
 	INT 21H
-	JC fileError			;Jump when carry flag set(error when open file)
-	mov fileHandle, AX		;Store File Handle
+	JC fileError				;Jump when carry flag set(error when open file)
+	mov fileHandle, AX			;Store File Handle
 	
-	MOV BX, fileHandle		;Use the fileHandle
-	LEA DX, buffer			;Address for buffer
-	MOV CX, 1024			;Read 1024 bytes
-	MOV AH, 3FH				;Read File
+	MOV BX, fileHandle			;Use the fileHandle
+	LEA DX, buffer				;Address for buffer
+	MOV CX, 1024				;Read 1024 bytes
+	MOV AH, 3FH					;Read File
 	INT 21H
-	JC fileError			;Jump when carry flag set(error when open file)
+	JC fileError				;Jump when carry flag set(error when open file)
 	
 	LEA SI, buffer
 	
@@ -36,14 +65,14 @@ openReadStockFile ENDP
 ;	closeStockFile
 ;	close the stock file(Phone.txt)
 ;------------------------------------------------------
-closeStockFile PROC
+closeFile PROC
 	mov bx, fileHandle
     mov ah, 3Eh             ; DOS function: close file
     int 21h
     jc fileError            ; If carry flag is set, an error occurred
 	
 	RET
-closeStockFile ENDP
+closeFile ENDP
 
 ;--------------------------------------------------
 ;	fileError
@@ -58,22 +87,35 @@ fileError:
     jmp exitReadFile
 
 exitReadFile:
-    call closeStockFile
+    call closeFile
 	
-;-----------------------------------------
+;-------------------------------------------------------
 ;	readStringFromFile
-;	Read a string from file to a holder
-;-----------------------------------------
+;	Read a string from file to a string with fill space
+;-------------------------------------------------------
 readStringFromFile PROC
+
 continueReadString:
 	MOV AL, [SI]
 	CMP AL, ';'
-	JE loopFillSpace
-	MOV [DI], AL 
-	DEC CX
-	INC SI
-	INC DI
-	JMP continueReadString
+	JE checkCX
+	
+	MOV AX, fillSpaceBool
+	CMP AX, 0
+	JE incCX
+	
+	continueMoveChar:
+		resetAX
+		MOV AL, [SI] 
+		MOV [DI], AL 
+		DEC CX
+		INC SI
+		INC DI
+		JMP continueReadString
+		
+checkCX:			;jump the loopFillSpace if CX = 0, to avoid error
+	CMP CX, 0
+	JE endReadString
 	
 loopFillSpace:
 	MOV AL, ' '
@@ -84,6 +126,10 @@ LOOP loopFillSpace
 endReadString:
 	INC SI
 	RET
+
+incCX:		;make sure CX no become zero if dont want to fill space
+	INC CX
+	JMP continueMoveChar
 
 readStringFromFile ENDP
 	
@@ -192,6 +238,8 @@ readNumber ENDP
 ;	Read one line of the file
 ;---------------------------------------
 readStockDetails PROC
+	MOV fillSpaceBool, 1
+
 	LEA DI, Stock.phoneName
 	MOV CX, 15
 	CALL readStringFromFile
@@ -228,7 +276,25 @@ readStockDetails PROC
 	RET
 readStockDetails ENDP
 
+;-------------------------------------------------
+;	readStaffDetails
+;	read the staff id and password from the file
+;-------------------------------------------------
+readStaffDetails PROC
+	MOV fillSpaceBool, 0
+	
+	LEA DI, Staff.userID
+	MOV CX, 0
+	CALL readStringFromFile
+	
+	LEA DI, Staff.userPw
+	MOV CX, 0
+	CALL readStringFromFile
+	
+	CALL jumpToNextLine
 
+	RET
+readStaffDetails ENDP
 
 ;-------------------------------------------------
 ;	jumpToNextLine

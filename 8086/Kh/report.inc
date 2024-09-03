@@ -54,7 +54,7 @@ displayDetails PROC
 	
 	reportFinish:
 		MOV numStockFound, 0
-		CALL closeStockFile
+		CALL closeFile
 		
 		reportDivider
 		
@@ -184,7 +184,7 @@ compareQty PROC
 		JMP compareNextQty
 		
 	compareQtyDone:
-		CALL closeStockFile
+		CALL closeFile
 		
 		MOV AH,09H
 		LEA DX,highestStockOut

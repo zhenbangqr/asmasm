@@ -3,18 +3,15 @@
 	promptLoginID DB "Enter user-ID :$"
 	promptPassword DB "Password :$"
 	
-	userID LABEL BYTE
+	inputID LABEL BYTE
 	maxUserIdLength DB 20
 	getUserIdLength DB ?
 	inputUserID DB 20 DUP("$")
 	
-	userPassword LABEL BYTE
+	inputPassword LABEL BYTE
 	maxUserPasswordLength DB 20
 	getUserPasswordLength DB ?
 	inputUserPassword DB 20 DUP("$")
-	
-	defaultPassword DB "best69$"
-	defaultUserID DB "user69$"
 	
 	loginFailMsg DB "Invalid User-ID or Password, please try again.$"
 	loginSucMsg DB " Welcome to Phone Inventory System$"
@@ -29,156 +26,165 @@ user_Login PROC
     INT 21H
 
     ;--New line
-    MOV AH,09H
-    LEA DX,newLine
+    MOV AH, 09H
+    LEA DX, newLine
     INT 21H
 	
 getUserIDInput:
     
 	;--Prompt for User-ID
-    MOV AH,09H
-    LEA DX,promptLoginID
+    MOV AH, 09H
+    LEA DX, promptLoginID
     INT 21H
 	
 	;Input User-ID
-    MOV AH,0AH
-	LEA DX, userID
+    MOV AH, 0AH
+	LEA DX, inputID
     INT 21H
     
 	;--Nextline
-	MOV AH,09H
-    LEA DX,newLine
+	MOV AH, 09H
+    LEA DX, newLine
     INT 21H
-
-getDefaultIDlength:
-	MOV BX,0
-	MOV SI,0
 	
-	;--Count the length of default User-ID by comparing '$' symbol
-	;--Loop the count if wrong symbol else jump to compareTwoIDlength 
-	countIDlength:
-	CMP defaultUserID[SI],'$'
-	JE compareTwoIDLength	
-	INC SI
-	MOV BX,SI
-	JMP countIDlength
-
-compareTwoIDLength:
+	CALL openReadStaffFile
 	
-	;--Compare the length of inputted User-ID and default User-ID
-	;--If equal jump to compareIDinput ， else jump to invalidInput 
-	MOV BH,userID[1]
-	CMP BL,BH
-	JNE invalidInput
-
-compareIDinput:
+readAndCompare:
+	resetAX
+	MOV AX, [SI]
+	CMP AX, 0
+	JE invalidInput
 	
-	;--Compare User-ID character one by one 
-	;--If all true then jump to getPasswordInput , else jump to invalidInput 
-	MOV CX, 0
-	MOV CL, BL
-	MOV SI, 2
-	MOV DI, 0
-	
-	userIdCompareLoop:
-		MOV BL,userID[SI]
-		CMP BL,defaultUserID[DI]
+	CALL readStaffDetails
+	getDefaultIDlength:
+		MOV DI, 0
+		MOV BX, 0
 		
-		JNE invalidInput
-		INC SI
+		;--Count the length of default User-ID by comparing '$' symbol
+		;--Loop the count if wrong symbol else jump to compareTwoIDlength 
+		countIDlength:
+		CMP Staff.userID[DI],'$'
+		JE compareTwoIDLength
 		INC DI
-	LOOP userIdCompareLoop
+		MOV BX, DI
+		JMP countIDlength
 	
-	JMP getPasswordInput
+	compareTwoIDLength:
+		
+		;--Compare the length of inputted User-ID and default User-ID
+		;--If equal jump to compareIDinput ， else jump to invalidInput 
+		MOV BH, inputID[1]
+		CMP BL, BH
 
-invalidInput:
-	;--Loop back to the getUserIDInput until user entered exact User-ID & Password
+		JNE readAndCompare
 	
-	MOV AH,09H
-    LEA DX,newLine
-    INT 21H
-	
-    ;--Display invalid ID message
-    MOV AH,09H
-    LEA DX,loginFailMsg
-    INT 21H
+	compareIDinput:
+		
+		;--Compare User-ID character one by one 
+		;--If all true then jump to getPasswordInput , else jump to invalidInput 
+		resetCX
+		MOV CL, inputID[1]
+		MOV BX, 2
+		MOV DI, 0
+		
+		userIdCompareLoop:
+			MOV AL, inputID[BX]
+			CMP AL, Staff.userID[DI]
+			JNE readAndCompare
+			
+			INC BX
+			INC DI
+		LOOP userIdCompareLoop
+		
+		JMP getPasswordInput
 
-    ;--Nextline
-    MOV AH,09H
-    LEA DX,newLine
-    INT 21H
+	invalidInput:
+		;--Loop back to the getUserIDInput until user entered exact User-ID & Password
+		
+		MOV AH,09H
+		LEA DX,newLine
+		INT 21H
+		
+		;--Display invalid ID message
+		MOV AH,09H
+		LEA DX,loginFailMsg
+		INT 21H
 	
-    JMP getUserIDInput
+		;--Nextline
+		MOV AH,09H
+		LEA DX,newLine
+		INT 21H
+		
+		CALL closeFile
+		JMP getUserIDInput
+		
+	getPasswordInput:
+		;--Prompt for User Password
+		MOV AH,09H
+		LEA DX,promptPassword
+		INT 21H
+		
+		;--Input User Password
+		MOV AH, 0AH
+		LEA DX, inputPassword
+		INT 21H
+		
+		;--Nextline
+		MOV AH,09H
+		LEA DX,newLine
+		INT 21H	
 	
-getPasswordInput:
-    ;--Prompt for User Password
-    MOV AH,09H
-    LEA DX,promptPassword
-    INT 21H
+	getDefaultPasswordLength:
+		MOV BX,0
+		
+		;--Count the length of default Password by comparing '$' symbol
+		;--Loop the count if wrong symbol else jump to compareTwoPasswordLength 
+		
+		countPasswordLength:
+		CMP Staff.userPw[BX],'$'
+		JE compareTwoPasswordLength
+		INC BX
+		JMP countPasswordLength
 	
-	;--Input User Password
-    MOV AH,0AH
-	LEA DX, userPassword
-    INT 21H
-    
-	;--Nextline
-	MOV AH,09H
-    LEA DX,newLine
-    INT 21H	
-
-getDefaultPasswordLength:
-	MOV BX,0
-	MOV SI,0
-	
-	;--Count the length of default Password by comparing '$' symbol
-	;--Loop the count if wrong symbol else jump to compareTwoPasswordLength 
-	
-	countPasswordLength:
-	CMP defaultPassword[SI],'$'
-	JE compareTwoPasswordLength
-	INC SI
-	MOV BX,SI
-	JMP countPasswordLength
-
-compareTwoPasswordLength:
-	;--Compare the length of inputted User Password and default User Password
-	;--If equal jump to compareTwoPasswordInput ， else jump to invalidInput 
-	
-	MOV BH,userPassword[1]
-	CMP BL,BH
-	JNE invalidInput
-	
-compareTwoPasswordInput:
-	MOV CX, 0
-	MOV CL, BL
-	MOV SI, 2
-	MOV DI, 0
-	
-	userPasswordCompareLoop:
-		MOV BL,userPassword[SI]
-		CMP BL,defaultPassword[DI]
-				
+	compareTwoPasswordLength:
+		;--Compare the length of inputted User Password and default User Password
+		;--If equal jump to compareTwoPasswordInput ， else jump to invalidInput 
+		
+		MOV BH,inputPassword[1]
+		CMP BL,BH
 		JNE invalidInput
-		INC SI
-		INC DI
-	LOOP userPasswordCompareLoop
+		
+	compareTwoPasswordInput:
+		MOV CX, 0
+		MOV CL, BL
+		MOV BX, 2
+		MOV DI, 0
+		
+		userPasswordCompareLoop:
+			MOV AL, inputPassword[BX]
+			CMP AL, Staff.userPw[DI]
+					
+			JNE invalidInput
+			INC BX
+			INC DI
+		LOOP userPasswordCompareLoop
+		
+		MOV AH,09H
+		LEA DX,newLine
+		INT 21H
+		
+		; Display Success login
+		MOV AH,09H
+		LEA DX,loginSucMsg
+		INT 21H
 	
-	MOV AH,09H
-    LEA DX,newLine
-    INT 21H
-	
-    ; Display Success login
-    MOV AH,09H
-    LEA DX,loginSucMsg
-    INT 21H
-
-    ; New line
-    MOV AH,09H
-    LEA DX,newLine
-    INT 21H
-	
-	RET
-	
+		; New line
+		MOV AH,09H
+		LEA DX,newLine
+		INT 21H
+		
+		RET
+		
 user_Login ENDP
 
 .CODE

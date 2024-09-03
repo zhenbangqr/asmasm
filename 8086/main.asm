@@ -16,6 +16,13 @@
 	MSG4 db "GENERATE$"
 	MSG5 db "EXIT$"
 
+	user STRUC
+		userID DB 20 DUP('$')
+		userPw DB 20 DUP('$')
+	user ENDS
+	
+	Staff user<>
+
 	phone STRUC
 		phoneName DB 20 DUP('$')
 		phoneRAM DB 20 DUP('$')
@@ -29,7 +36,7 @@
 	phone ENDS
 	
 	Stock phone<>
-
+	
 .CODE
 
 ;-- INCLUDE the menu file
@@ -151,7 +158,7 @@ searchStock:
 		INT 21H
 	
 	EndDisplayResult:
-		CALL closeStockFile
+		CALL closeFile
 		JMP searchStockLoop
 		
 exitProgram:
