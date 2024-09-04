@@ -322,3 +322,26 @@ endSkipLine:
 	
 jumpToNextLine ENDP
 
+;-------------------------------------------------
+;	calculateStringLength
+;	calculate the length of the string
+;-------------------------------------------------
+calculateStringLength PROC
+		MOV BX, 0
+countStringLength:
+		;--Count the length of default Password by comparing '$' symbol
+		;--Loop the count if wrong symbol else jump to compareTwoPasswordLength 
+		
+		MOV AL, [DI]
+		
+		CMP AL, '$'
+		JE endReadStringLength
+		INC DI
+		INC BL
+		JMP countStringLength
+		
+endReadStringLength:
+	RET
+	
+calculateStringLength ENDP
+

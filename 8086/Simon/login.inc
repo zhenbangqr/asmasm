@@ -57,17 +57,9 @@ readAndCompare:
 	
 	CALL readStaffDetails
 	getDefaultIDlength:
-		MOV DI, 0
-		MOV BX, 0
-		
-		;--Count the length of default User-ID by comparing '$' symbol
-		;--Loop the count if wrong symbol else jump to compareTwoIDlength 
-		countIDlength:
-		CMP Staff.userID[DI],'$'
-		JE compareTwoIDLength
-		INC DI
-		MOV BX, DI
-		JMP countIDlength
+		MOV DI, OFFSET Staff.userID
+		CALL calculateStringLength
+		JMP compareTwoIDLength
 	
 	compareTwoIDLength:
 		
@@ -75,21 +67,20 @@ readAndCompare:
 		;--If equal jump to compareIDinput ， else jump to invalidInput 
 		MOV BH, inputID[1]
 		CMP BL, BH
-
 		JNE readAndCompare
 	
 	compareIDinput:
-		
 		;--Compare User-ID character one by one 
 		;--If all true then jump to getPasswordInput , else jump to invalidInput 
 		resetCX
-		MOV CL, inputID[1]
+		MOV CL, BL
 		MOV BX, 2
 		MOV DI, 0
 		
 		userIdCompareLoop:
 			MOV AL, inputID[BX]
-			CMP AL, Staff.userID[DI]
+			
+			CMP AL, Staff.userID[DI]			
 			JNE readAndCompare
 			
 			INC BX
@@ -97,6 +88,9 @@ readAndCompare:
 		LOOP userIdCompareLoop
 		
 		JMP getPasswordInput
+
+	pwNotEql:
+		JMP readAndCompare
 
 	invalidInput:
 		;--Loop back to the getUserIDInput until user entered exact User-ID & Password
@@ -135,16 +129,9 @@ readAndCompare:
 		INT 21H	
 	
 	getDefaultPasswordLength:
-		MOV BX,0
-		
-		;--Count the length of default Password by comparing '$' symbol
-		;--Loop the count if wrong symbol else jump to compareTwoPasswordLength 
-		
-		countPasswordLength:
-		CMP Staff.userPw[BX],'$'
-		JE compareTwoPasswordLength
-		INC BX
-		JMP countPasswordLength
+		MOV DI, OFFSET Staff.userID
+		CALL calculateStringLength
+		JMP compareTwoPasswordLength
 	
 	compareTwoPasswordLength:
 		;--Compare the length of inputted User Password and default User Password
@@ -152,7 +139,7 @@ readAndCompare:
 		
 		MOV BH,inputPassword[1]
 		CMP BL,BH
-		JNE invalidInput
+		JNE pwNotEql
 		
 	compareTwoPasswordInput:
 		MOV CX, 0
@@ -164,7 +151,7 @@ readAndCompare:
 			MOV AL, inputPassword[BX]
 			CMP AL, Staff.userPw[DI]
 					
-			JNE invalidInput
+			JNE pwNotEql
 			INC BX
 			INC DI
 		LOOP userPasswordCompareLoop
