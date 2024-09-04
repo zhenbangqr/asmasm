@@ -4,7 +4,6 @@
     buffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
 	fileErrorMsg DB "Error Occured!$"
-	fillSpaceBool DW ? 	;1=yes, 2=no
 .code
 
 ;--------------------------------------------
@@ -98,39 +97,17 @@ readStringFromFile PROC
 continueReadString:
 	MOV AL, [SI]
 	CMP AL, ';'
-	JE checkCX
-	
-	MOV AX, fillSpaceBool
-	CMP AX, 0
-	JE incCX
-	
-	continueMoveChar:
-		resetAX
-		MOV AL, [SI] 
-		MOV [DI], AL 
-		DEC CX
-		INC SI
-		INC DI
-		JMP continueReadString
-		
-checkCX:			;jump the loopFillSpace if CX = 0, to avoid error
-	CMP CX, 0
 	JE endReadString
-	
-loopFillSpace:
-	MOV AL, ' '
-	MOV [DI], AL
+
+	MOV [DI], AL 
+	INC SI
 	INC DI
-LOOP loopFillSpace
-	
+	JMP continueReadString
+		
 endReadString:
 	INC SI
 	RET
-
-incCX:		;make sure CX no become zero if dont want to fill space
-	INC CX
-	JMP continueMoveChar
-
+	
 readStringFromFile ENDP
 	
 ;---------------------------------------
@@ -238,22 +215,16 @@ readNumber ENDP
 ;	Read one line of the file
 ;---------------------------------------
 readStockDetails PROC
-	MOV fillSpaceBool, 1
-
 	LEA DI, Stock.phoneName
-	MOV CX, 15
 	CALL readStringFromFile
 
 	LEA DI, Stock.phoneRAM
-	MOV CX, 10
 	CALL readStringFromFile
 	
 	LEA DI, Stock.phoneROM
-	MOV CX, 10
 	CALL readStringFromFile
 	
 	LEA DI, Stock.phoneColor
-	MOV CX, 10
 	CALL readStringFromFile
 	
 	CALL readStockPrice
@@ -281,8 +252,6 @@ readStockDetails ENDP
 ;	read the staff id and password from the file
 ;-------------------------------------------------
 readStaffDetails PROC
-	MOV fillSpaceBool, 0
-	
 	LEA DI, Staff.userID
 	MOV CX, 0
 	CALL readStringFromFile

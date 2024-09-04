@@ -48,6 +48,13 @@ displayStockDetails PROC
 	MOV AH, 09H
 	LEA DX, Stock.phoneName
 	INT 21H
+	
+	;fill in space
+	MOV CX, 15						;set the size
+	LEA DI, Stock.phoneName
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
 
 	delimiter
 	space
@@ -56,11 +63,25 @@ displayStockDetails PROC
 	LEA DX, Stock.phoneRAM
 	INT 21H
 	
+	;fill in space
+	MOV CX, 10						;set the size
+	LEA DI, Stock.phoneRAM
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
+	
 	delimiter
 	
 	MOV AH, 09H
 	LEA DX, Stock.phoneROM
 	INT 21H
+	
+	;fill in space
+	MOV CX, 10						;set the size
+	LEA DI, Stock.phoneROM
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
 	
 	delimiter
 	space
@@ -68,6 +89,13 @@ displayStockDetails PROC
 	MOV AH, 09H
 	LEA DX, Stock.phoneColor
 	INT 21H
+
+	;fill in space
+	MOV CX, 10						;set the size
+	LEA DI, Stock.phoneColor
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
 	
 	delimiter
 	space
@@ -127,7 +155,6 @@ printNumber:
 	ADD DL, 30H
 	INT 21H
 LOOP printNumber
-
 	MOV CX, 0
 	MOV CX, BX
 	
