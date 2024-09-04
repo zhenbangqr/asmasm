@@ -55,6 +55,60 @@ invalidInputChoice:
 
 searchMenu ENDP	
 
+;----------------------------------------------
+;	inputAndSearch
+;	input a phone name and search the phone
+;----------------------------------------------
+inputAndSearch PROC
+	CALL openReadStockFile
+	CALL jumpToNextLine			;Skip the file title
+	CALL searchPhoneStock
+	JMP compareStringLoop
+
+	compareStringLoop:
+		CALL readStockDetails
+
+		CALL cmpString
+		CMP searchCheck, 1
+		JE displayResult
+
+		MOV AX, [SI]
+		CMP AX, 0
+		JE checkSearchResultEqlZero
+		
+		JMP compareStringLoop
+	
+	displayResult:
+		INC numStockFound
+		
+		CMP numStockFound, 1
+		JNE skipDisplaySearchTitle
+		CALL displaySearchTitle
+
+	skipDisplaySearchTitle:
+		CALL displayStockDetails
+		
+		MOV AX, [SI]
+		CMP AX, 0
+		JE checkSearchResultEqlZero
+		
+		JMP compareStringLoop
+	
+	checkSearchResultEqlZero:
+		CMP numStockFound, 0
+		JE DisplayNotFoundMsg
+		displayDivider
+		JMP EndDisplayResult
+		
+	DisplayNotFoundMsg:
+		MOV AH, 09H
+		LEA DX, searchFailMsg
+		INT 21H
+		
+	EndDisplayResult:
+		RET
+
+inputAndSearch ENDP
 
 ;----------------------------------------------
 ;	searchPhoneStock

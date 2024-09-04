@@ -94,19 +94,19 @@ exitReadFile:
 ;-------------------------------------------------------
 readStringFromFile PROC
 
-continueReadString:
-	MOV AL, [SI]
-	CMP AL, ';'
-	JE endReadString
-
-	MOV [DI], AL 
-	INC SI
-	INC DI
-	JMP continueReadString
-		
-endReadString:
-	INC SI
-	RET
+	continueReadString:
+		MOV AL, [SI]
+		CMP AL, ';'
+		JE endReadString
+	
+		MOV [DI], AL 
+		INC SI
+		INC DI
+		JMP continueReadString
+			
+	endReadString:
+		INC SI
+		RET
 	
 readStringFromFile ENDP
 	
@@ -123,55 +123,58 @@ readStockPrice PROC
 	
 	MOV AX, BX
 	INC SI
-continueReadPrice:
-	MOV BL, [SI]
-	CMP BL, '.'
-	JE endReadPrice
 	
-	MUL ten16Bits
-	SUB BL, 30H
-	ADD AX, BX
+	continueReadPrice:
+		MOV BL, [SI]
+		CMP BL, '.'
+		JE endReadPrice
 	
-	INC SI
+		MUL ten16Bits
+		SUB BL, 30H
+		ADD AX, BX
 	
-	JMP continueReadPrice
-endReadPrice:
-	MOV WORD PTR Stock.phonePrice, AX
-	MOV WORD PTR Stock.phonePrice + 2, DX
+		INC SI
+	
+		JMP continueReadPrice
+		
+	endReadPrice:
+		MOV WORD PTR Stock.phonePrice, AX
+		MOV WORD PTR Stock.phonePrice + 2, DX
 
-	INC SI
+		INC SI
 	
-	JMP readPriceFP
+		JMP readPriceFP
 
-readPriceFP:
-	MOV AX, 0
-	MOV BX, 0
+	readPriceFP:
+		MOV AX, 0
+		MOV BX, 0
+		
+		MOV BL, [SI]
+		SUB BL, 30H
+		
+		MOV AX, BX
+		INC SI
+		
+	continueReadPriceFP:
+		MOV BL, [SI]
+		CMP BL, ';'
+		JE endReadPriceFP
+		
+		MUL ten16Bits
+		SUB BL, 30H
+		ADD AX, BX
+		
+		INC SI
+		
+		JMP continueReadPriceFP
+		
+	endReadPriceFP:
+		MOV WORD PTR Stock.phonePriceFP, AX
+		MOV WORD PTR Stock.phonePriceFP + 2, DX
 	
-	MOV BL, [SI]
-	SUB BL, 30H
-	
-	MOV AX, BX
-	INC SI
-	
-continueReadPriceFP:
-	MOV BL, [SI]
-	CMP BL, ';'
-	JE endReadPriceFP
-	
-	MUL ten16Bits
-	SUB BL, 30H
-	ADD AX, BX
-	
-	INC SI
-	
-	JMP continueReadPriceFP
-endReadPriceFP:
-	MOV WORD PTR Stock.phonePriceFP, AX
-	MOV WORD PTR Stock.phonePriceFP + 2, DX
-
-	INC SI
-	RET
-	
+		INC SI
+		RET
+		
 readStockPrice ENDP
 
 ;----------------------------------------
@@ -190,22 +193,22 @@ readNumber PROC
 	MOV AX, BX
 	INC SI
 	
-continueReadNumber:
-	MOV BL, [SI]
-	CMP BL, ';'
-	JE endReadNumber
+	continueReadNumber:
+		MOV BL, [SI]
+		CMP BL, ';'
+		JE endReadNumber
+		
+		MUL ten16Bits
+		SUB BL, 30H
+		ADD AX, BX
+		
+		INC SI
+		
+		JMP continueReadNumber
 	
-	MUL ten16Bits
-	SUB BL, 30H
-	ADD AX, BX
-	
-	INC SI
-	
-	JMP continueReadNumber
-
-endReadNumber:
-	INC SI
-	RET
+	endReadNumber:
+		INC SI
+		RET
 
 readNumber ENDP
 
@@ -270,25 +273,25 @@ readStaffDetails ENDP
 ;	Jump to the next line in a file while reading
 ;-------------------------------------------------
 jumpToNextLine PROC
-nextLineCheck:
-	MOV AL, [SI]
-	CMP AL, 0DH
-	JE lineFeedCheck
-	INC SI
-	JMP nextLineCheck
-
-lineFeedCheck:
-	INC SI
-	MOV AL, [SI]
-	CMP AL, 0AH
-	JE endSkipLine
+	nextLineCheck:
+		MOV AL, [SI]
+		CMP AL, 0DH
+		JE lineFeedCheck
+		INC SI
+		JMP nextLineCheck
 	
-	JMP nextLineCheck
-
-endSkipLine:
-	INC SI
-	RET
+	lineFeedCheck:
+		INC SI
+		MOV AL, [SI]
+		CMP AL, 0AH
+		JE endSkipLine
+		
+		JMP nextLineCheck
 	
+	endSkipLine:
+		INC SI
+		RET
+		
 jumpToNextLine ENDP
 
 ;-------------------------------------------------
@@ -296,21 +299,21 @@ jumpToNextLine ENDP
 ;	calculate the length of the string
 ;-------------------------------------------------
 calculateStringLength PROC
-		MOV BX, 0
-countStringLength:
-		;--Count the length of default Password by comparing '$' symbol
-		;--Loop the count if wrong symbol else jump to compareTwoPasswordLength 
-		
-		MOV AL, [DI]
-		
-		CMP AL, '$'
-		JE endReadStringLength
-		INC DI
-		INC BL
-		JMP countStringLength
-		
-endReadStringLength:
-	RET
+	MOV BX, 0
+	
+	countStringLength:
+			;--Count the length of string by comparing '$' symbol
+			
+			MOV AL, [DI]
+			
+			CMP AL, '$'
+			JE endReadStringLength
+			INC DI
+			INC BL
+			JMP countStringLength
+			
+	endReadStringLength:
+		RET
 	
 calculateStringLength ENDP
 

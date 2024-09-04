@@ -54,6 +54,11 @@ MAIN PROC
     MOV DS,AX
 
 loginLoop:
+	CALL loginPage
+	
+	CMP choice, 2
+	JE exitProgram
+	
 	CALL user_login
 	
 menuLoop:
@@ -70,7 +75,15 @@ menuLoop:
     CMP choice, 4
     JE generateReport
 	
-    JMP exitProgram
+    JMP logOut
+
+
+logOut:
+	CALL logOutComfirm
+	
+	CMP choice, 2
+	JE menuLoop
+	JMP loginLoop
 
 stockIn:
     ; Code for Stock In
@@ -111,56 +124,12 @@ searchStock:
 		CMP choice, 2
 		JE menuLoop
 		
-		CALL openReadStockFile
-		CALL jumpToNextLine			;Skip the file title
-		CALL searchPhoneStock
-		JMP compareStringLoop
-
-	
-	compareStringLoop:
-		CALL readStockDetails
-
-		CALL cmpString
-		CMP searchCheck, 1
-		JE displayResult
-
-		MOV AX, [SI]
-		CMP AX, 0
-		JE checkSearchResultEqlZero
+		CALL inputAndSearch
 		
-		JMP compareStringLoop
-	
-	displayResult:
-		INC numStockFound
-		
-		CMP numStockFound, 1
-		JNE skipDisplaySearchTitle
-		CALL displaySearchTitle
-
-	skipDisplaySearchTitle:
-		CALL displayStockDetails
-		
-		MOV AX, [SI]
-		CMP AX, 0
-		JE checkSearchResultEqlZero
-		
-		JMP compareStringLoop
-	
-	checkSearchResultEqlZero:
-		CMP numStockFound, 0
-		JE DisplayNotFoundMsg
-		displayDivider
-		JMP EndDisplayResult
-		
-	DisplayNotFoundMsg:
-		MOV AH, 09H
-		LEA DX, searchFailMsg
-		INT 21H
-	
-	EndDisplayResult:
 		CALL closeFile
 		JMP searchStockLoop
-		
+
+
 exitProgram:
 	MOV AH,09H
     LEA DX, MSG5
