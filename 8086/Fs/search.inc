@@ -40,6 +40,9 @@ nextStepChoiceLoop:
 	JA invalidInputChoice
 	
 	MOV choice, AL
+	
+	clnScr
+	
 	RET
 	
 invalidInputChoice:
@@ -50,6 +53,9 @@ invalidInputChoice:
 	MOV AH, 09H
 	LEA DX, newLine
 	INT 21H
+	
+	pause
+	clnScr
 	
 	JMP nextStepChoiceLoop
 
@@ -98,6 +104,7 @@ inputAndSearch PROC
 		CMP numStockFound, 0
 		JE DisplayNotFoundMsg
 		displayDivider
+		print_NewLine
 		JMP EndDisplayResult
 		
 	DisplayNotFoundMsg:
@@ -105,7 +112,11 @@ inputAndSearch PROC
 		LEA DX, searchFailMsg
 		INT 21H
 		
+		print_NewLine
+		
 	EndDisplayResult:
+		pause
+		clnScr
 		RET
 
 inputAndSearch ENDP

@@ -18,7 +18,7 @@
 	inputUserPassword DB 20 DUP("$")
 	
 	loginFailMsg DB "Invalid User-ID or Password, please try again.$"
-	loginSucMsg DB " Welcome to Phone Inventory System$"
+	loginSucMsg DB " Login successfully$"
 	
 .CODE
 
@@ -46,6 +46,7 @@ loginPage PROC
 		JA invalidLoginChoice
 		
 		MOV choice, AL
+		clnScr
 		RET
 		
 	invalidLoginChoice:
@@ -57,22 +58,20 @@ loginPage PROC
 		LEA DX, newLine
 		INT 21H
 		
+		pause
+		clnScr
+		
 		JMP loginComfirmationLoop
 		
 loginPage ENDP
 
 user_Login PROC
-	;--Display the login title
-	MOV AH,09H
-	LEA DX,loginTitle
-	INT 21H
-
-	;--New line
-	MOV AH, 09H
-	LEA DX, newLine
-	INT 21H
-		
 	getUserIDInput:
+		;--Display the login title
+		MOV AH,09H
+		LEA DX,loginTitle
+		INT 21H
+		
 		;--Prompt for User-ID
 		MOV AH, 09H
 		LEA DX, promptLoginID
@@ -151,6 +150,10 @@ user_Login PROC
 			INT 21H
 			
 			CALL closeFile
+			
+			pause
+			clnScr
+			
 			JMP getUserIDInput
 			
 		getPasswordInput:
@@ -211,6 +214,9 @@ user_Login PROC
 			LEA DX,newLine
 			INT 21H
 			
+			pause
+			clnScr
+			
 			RET
 		
 user_Login ENDP
@@ -238,6 +244,9 @@ logOutComfirm PROC
 		JA invalidLogOutChoice
 		
 		MOV choice, AL
+		
+		clnScr
+		
 		RET
 	
 	invalidLogOutChoice:
@@ -248,6 +257,9 @@ logOutComfirm PROC
 		MOV AH, 09H
 		LEA DX, newLine
 		INT 21H
+		
+		pause
+		clnScr
 		
 		JMP logOutComfirmationLoop
 

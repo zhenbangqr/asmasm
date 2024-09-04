@@ -46,6 +46,9 @@ choiceLoop:
     JA invalidChoice
 	
 	MOV choice,AL
+	
+	clnScr
+	
 	RET 
     
 invalidChoice:
@@ -57,6 +60,9 @@ invalidChoice:
     LEA DX, newLine
     INT 21H
     
+	pause
+	clnScr
+	
     JMP choiceLoop
     
 user_Menu ENDP
