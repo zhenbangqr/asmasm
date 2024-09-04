@@ -113,7 +113,7 @@ displayStockDetails PROC
 	MOV AX, WORD PTR Stock.phonePriceFP
 	MOV DX, WORD PTR Stock.phonePriceFP + 2
 	CALL displayNumber
-	CALL autoFillSpace
+	CALL fillSpace
 	
 	delimiter
 	space
@@ -122,7 +122,7 @@ displayStockDetails PROC
 	MOV DX, WORD PTR Stock.phoneQty + 2
 	MOV BX, 10
 	CALL displayNumber
-	CALL autoFillSpace
+	CALL fillSpace
 	
 	MOV AH, 09H
 	LEA DX, newLine

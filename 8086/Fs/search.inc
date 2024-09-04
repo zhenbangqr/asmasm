@@ -3,10 +3,12 @@
 	searchSucMsg DB "Here is your search results. Please select your next step. $"
 	searchFailMsg DB "No result found. Please select your next step. $"
 	nextStepPrompt DB "1. Search stock", 0DH, 0AH, "2. Exit Search", 0DH, 0AH, "Please Enter Your Choice : $"
+	
 	searchInput LABEL BYTE
 	strLength DB 30
 	strActNum DB ?
 	searchStr DB 30 DUP("$") 
+	
 	arrNum DW 0
 .CODE
 
@@ -134,10 +136,7 @@ searchPhoneStock PROC
 	LEA DX, searchInput
 	INT 21H
 	
-	;New Line
-	MOV AH, 09H
-	LEA DX, newLine
-	INT 21H
+	print_NewLine
 	
 	RET
 		
