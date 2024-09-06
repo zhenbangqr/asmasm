@@ -44,6 +44,7 @@ INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
+INCLUDE Fs\test.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
@@ -107,7 +108,7 @@ searchStock:
 		JE menuLoop
 		
 		CALL inputAndSearch
-		
+
 		CALL closeFile
 		JMP searchStockLoop
 

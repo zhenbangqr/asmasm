@@ -173,7 +173,7 @@ user_Login PROC
 			INT 21H	
 		
 		getDefaultPasswordLength:
-			MOV DI, OFFSET Staff.userID
+			LEA DI,Staff.userID ;LEA DI,Staff.userID
 			CALL calculateStringLength
 			JMP compareTwoPasswordLength
 		

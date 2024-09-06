@@ -1,7 +1,7 @@
 .DATA
     stockFileName DB 'Phone.txt', 0
     staffFileName DB 'staff.txt', 0
-    buffer DW 1024 DUP(?)    ; Buffer to store file content
+    readBuffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
 	fileErrorMsg DB "Error Occured!$"
 	
@@ -21,20 +21,20 @@
 openReadStaffFile PROC
 
 	MOV AH, 3DH					;Open file
-	MOV AL, 0					;Open for reading
+	MOV AL, 2					;Open for reading and writing
 	MOV DX, OFFSET staffFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
-	LEA DX, buffer				;Address for buffer
+	LEA DX, readBuffer				;Address for buffer
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	
-	LEA SI, buffer
+	LEA SI, readBuffer
 	
 	RET
 
@@ -48,20 +48,20 @@ openReadStaffFile ENDP
 openReadStockFile PROC
 
 	MOV AH, 3DH					;Open file
-	MOV AL, 0					;Open for reading
+	MOV AL, 2					;Open for reading and writing
 	MOV DX, OFFSET stockFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
-	LEA DX, buffer				;Address for buffer
+	LEA DX, readBuffer				;Address for buffer
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	
-	LEA SI, buffer
+	LEA SI, readBuffer
 	
 	RET
 

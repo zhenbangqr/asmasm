@@ -75,7 +75,7 @@ inputAndSearch PROC
 
 	compareStringLoop:
 		CALL readStockDetails
-
+		CALL appendStringToBuffer
 		CALL cmpString
 		CMP searchCheck, 1
 		JE displayResult
