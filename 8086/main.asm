@@ -108,7 +108,6 @@ searchStock:
 		JE menuLoop
 		
 		CALL inputAndSearch
-
 		CALL closeFile
 		JMP searchStockLoop
 

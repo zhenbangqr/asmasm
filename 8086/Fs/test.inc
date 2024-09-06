@@ -4,7 +4,7 @@
 .code
 
 appendStringToBuffer PROC
-	PUSH SI //This SI hold the readFilePointer
+	PUSH SI ;This SI hold the readFilePointer
 	
 	LEA SI, writeBuffer
 
