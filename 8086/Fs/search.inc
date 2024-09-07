@@ -68,17 +68,24 @@ searchMenu ENDP
 ;	input a phone name and search the phone
 ;----------------------------------------------
 inputAndSearch PROC
+	CALL openWriteStockFile
+	;CALL writeStockFileTitle
+
 	CALL openReadStockFile
 	CALL jumpToNextLine			;Skip the file title
+
 	CALL searchPhoneStock
 	JMP compareStringLoop
 
 	compareStringLoop:
+		CALL clearStockVariableBuffer
 		CALL readStockDetails
-		CALL appendStringToBuffer
+		CALL appendToBuffer
 		CALL cmpString
 		CMP searchCheck, 1
 		JE displayResult
+
+		;CALL clearStockVariableBuffer
 
 		MOV AX, [SI]
 		CMP AX, 0
@@ -99,6 +106,8 @@ inputAndSearch PROC
 		MOV AX, [SI]
 		CMP AX, 0
 		JE checkSearchResultEqlZero
+		
+		;CALL clearStockVariableBuffer
 		
 		JMP compareStringLoop
 	

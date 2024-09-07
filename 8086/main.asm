@@ -109,6 +109,8 @@ searchStock:
 		
 		CALL inputAndSearch
 		CALL closeFile
+		CALL closeWriteFile
+		;CALL switchStockFileName
 		JMP searchStockLoop
 
 logOut:

@@ -21,7 +21,7 @@
 openReadStaffFile PROC
 
 	MOV AH, 3DH					;Open file
-	MOV AL, 2					;Open for reading and writing
+	MOV AL, 2					;Open for reading
 	MOV DX, OFFSET staffFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
@@ -48,7 +48,7 @@ openReadStaffFile ENDP
 openReadStockFile PROC
 
 	MOV AH, 3DH					;Open file
-	MOV AL, 2					;Open for reading and writing
+	MOV AL, 0					;Open for reading
 	MOV DX, OFFSET stockFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
@@ -410,3 +410,35 @@ stringToNumber PROC
 		RET
 
 stringToNumber ENDP
+
+clearReadBuffer PROC
+    MOV AL, 0             ; Value to fill the buffer (zero in this case)
+clearBufferLoop:
+	MOV AH, [DI]
+	CMP AH, "$"
+	JE endClearBufferLoop
+	
+	CMP AH, 0DH
+	JE endClearBufferLoop
+	
+    MOV [DI], AL          ; Store value AL at address DI
+    INC DI                ; Move to the next byte
+    JMP clearBufferLoop
+	
+endClearBufferLoop:
+	RET
+	
+clearReadBuffer ENDP
+
+clearStockVariableBuffer PROC
+	LEA DI, Stock.phoneName
+	CALL clearReadBuffer
+	LEA DI, Stock.phoneRAM
+	CALL clearReadBuffer
+	LEA DI, Stock.phoneROM
+	CALL clearReadBuffer
+	LEA DI, Stock.phoneColor
+	CALL clearReadBuffer
+	
+	RET
+clearStockVariableBuffer ENDP

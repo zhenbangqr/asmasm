@@ -1,9 +1,49 @@
 .data  
+	stockFileTitle DB "Name;RAM;ROM;Color;Price;Qty;StockInQty;StockOutQty;$"
+
 	writeBuffer DW 1024 DUP(?)    ; Buffer to store file content
 	bufferLength DW ?
+	tempFileName DB "temp.txt"
+	fileHandleWrite DW ?         ; To store the file handle
 .code
 
-appendStringToBuffer PROC
+openWriteStockFile PROC
+	MOV AH, 3DH					;Open file
+	MOV AL, 1					;Open for reading and write
+	MOV DX, OFFSET tempFileName
+	INT 21H
+	mov fileHandleWrite, AX			;Store File Handle
+	
+	RET
+openWriteStockFile ENDP
+
+closeWriteFile PROC
+	MOV BX, fileHandleWrite
+	MOV AH, 3EH
+	INT 21H
+	
+	RET
+closeWriteFile ENDP
+
+;----------------------------------------
+;	writeStockFileTitle
+;	write the title of the stock file
+;----------------------------------------
+writeStockFileTitle PROC
+	LEA DI, stockFileTitle
+	CALL appendString
+	
+	LEA DI, newLine
+	CALL appendString
+	
+	CALL writeStockFile
+writeStockFileTitle ENDP
+
+;----------------------------------------
+;	appendStringToBuffer
+;	append the data to the write buffer
+;----------------------------------------
+appendToBuffer PROC
 	PUSH SI ;This SI hold the readFilePointer
 	
 	LEA SI, writeBuffer
@@ -36,20 +76,59 @@ appendStringToBuffer PROC
 	MOV [SI], AL
 	INC SI
 	
+	MOV AX, WORD PTR Stock.phonePrice
+	MOV DX, WORD PTR Stock.phonePrice + 2	
+	CALL appendNumber
+
+	MOV AL, '.'
+	MOV [SI], AL
+	INC SI
+	
+	MOV AX, WORD PTR Stock.phonePriceFP
+	MOV DX, WORD PTR Stock.phonePriceFP + 2	
+	CALL appendNumber
+	
+	MOV AL, ';'
+	MOV [SI], AL
+	INC SI
+	
+	MOV AX, WORD PTR Stock.phoneQty
+	MOV DX, WORD PTR Stock.phoneQty + 2	
+	CALL appendNumber
+	
+	MOV AL, ';'
+	MOV [SI], AL
+	INC SI
+	
+	MOV AX, WORD PTR Stock.totalStockInQty
+	MOV DX, WORD PTR Stock.totalStockInQty + 2	
+	CALL appendNumber
+	
+	MOV AL, ';'
+	MOV [SI], AL
+	INC SI
+	
+	MOV AX, WORD PTR Stock.totalStockOutQty
+	MOV DX, WORD PTR Stock.totalStockOutQty + 2	
+	CALL appendNumber
+	
+	MOV AL, ';'
+	MOV [SI], AL
+	INC SI
+	
 	LEA DI, newLine
 	call appendString
-	MOV BX, SI
 	
 	POP SI
 	
 	CALL writeStockFile
 	RET
-appendStringToBuffer ENDP
+appendToBuffer ENDP
 
-
-
-
-
+;-----------------------------------------------
+;	appendString
+;	append the string
+;-----------------------------------------------
 appendString PROC
 	MOV AL, [DI]
 	CMP AL, '$'
@@ -65,24 +144,33 @@ doneAppending:
 appendString ENDP
 
 
-
-
-
+;---------------------------------
+;	writeStockFile
+;	write the buffer to the file
+;---------------------------------
 writeStockFile PROC
 	LEA DI, writeBuffer
 	CALL countBufferLength
 
     MOV AH, 40H
-	MOV BX, fileHandle
+	MOV BX, fileHandleWrite
 	LEA DX, writeBuffer
 	MOV CX, bufferLength
 	
 	INT 21H
 	
-	RET
+	;clear the Buffer
+	LEA DI, writeBuffer
+	CALL clearBufferLoop
 	
+	RET
 writeStockFile ENDP
 
+
+;-----------------------------------------------
+;	countBufferLength
+;	count the length of the buffer for writting
+;-----------------------------------------------
 countBufferLength PROC
 	MOV BX, 0
 	MOV AX, 0 
@@ -101,3 +189,57 @@ countBufferLength PROC
 		MOV bufferLength, BX
 		RET
 countBufferLength ENDP
+
+;---------------------------------------
+;	appendNumber
+;	append the number 
+;---------------------------------------
+appendNumber PROC
+	MOV CX, 0
+	appendNumberLoop:
+		DIV ten16Bits
+		PUSH DX
+		INC CX
+		MOV DX, 0000H
+		CMP AX, DX
+		JNE appendNumberLoop
+	
+	appendNumberToBuffer:
+		POP AX
+		ADD AL, 30H
+		MOV [SI], AL
+		INC SI
+	LOOP appendNumberToBuffer
+	
+	RET
+appendNumber ENDP
+
+;----------------------------------------------------
+;	updateFile
+;	change the new file name and clear the older one
+;----------------------------------------------------
+updateStockFileName PROC
+	MOV AH, 56h          ; DOS function to rename a file
+    LEA DX, tempFileName  ; Address of the current file name
+    LEA DI, stockFileName ; Address of the new file name
+    INT 21H              ; Call DOS
+	
+	RET
+updateStockFileName ENDP
+
+
+switchStockFileName PROC
+	MOV AH, 3Dh          ; DOS function to open a file
+    LEA DX, stockFileName     ; Address of the file name
+    MOV AL, 2            ; Open for write access (truncates the file)
+    INT 21H              ; Call DOS
+
+; Close the file (finalize truncation)
+    MOV AH, 3Eh          ; DOS function to close a file
+    MOV BX, AX           ; File handle from the open operation
+    INT 21H              ; Call DOS
+	
+	CALL updateStockFileName
+
+	RET
+switchStockFileName ENDP
