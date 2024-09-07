@@ -3,6 +3,7 @@
 .DATA 
 	ten8Bits DB 10
 	ten16Bits DW 10
+	hundred16bits DW 100
     choice DB ?
 	searchCheck DB 0
 	numStockFound DB 0
