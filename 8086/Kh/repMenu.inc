@@ -2,112 +2,109 @@
 	reportTitle DB "==                          Report                           ==", 0DH, 0AH, "$"
 	reportChoice DB "1. Monthly Stock In Report", 0DH, 0AH, "2. Monthly Stock Out Report", 0DH, 0AH, "3. Inventory Status Report", 0DH, 0AH, "4. Return", 0DH, 0AH, "$"
 	promptReportChoice DB "Enter a digit(1-4): $"
-	repDivider DB "===============================================================", 0DH, 0AH, "$"
+	reportDivider DB "===============================================================", 0DH, 0AH, "$"
+	invStatusDivider DB "============================================================================", 0DH, 0AH, "$"
 	stockInTitle DB "==                  Monthly Stock In Report                  ==", 0DH, 0AH, "$"
 	stockOutTitle DB "==                  Monthly Stock Out Report                 ==", 0DH, 0AH, "$"
-	invStatTitle DB "==                  Inventory Status Report                  ==", 0DH, 0AH, "$"
-	highestStockOut DB "                                   Highest Stock Out|$"
-	NL DB 0DH, 0AH, "$"
+	invStatTitle DB "==                        Inventory Status Report                         ==", 0DH, 0AH, "$"
 	
 .CODE
 
 reportMenu PROC
 	
-	reportList:
+	rptList:
 		clnScr
-		reportDivider
+		rptDivider
 		
-		
-		MOV AH,09H
-		LEA DX,reportTitle
+		MOV AH, 09H
+		LEA DX, reportTitle
 		INT 21H
 		
-		reportDivider
+		rptDivider
 		
-		MOV AH,09H
-		LEA DX,reportChoice
+		MOV AH, 09H
+		LEA DX, reportChoice
 		INT 21H
 		
-		MOV AH,09H
-		LEA DX,promptReportChoice
+		MOV AH, 09H
+		LEA DX, promptReportChoice
 		INT 21H
 		
-		MOV AH,01H
+		MOV AH, 01H
 		INT 21H
-		SUB AL,30H
+		SUB AL, 30H
 		
-		CMP AL,1
-		JB reportInvalidChoice
-		CMP AL,4
-		JA reportInvalidChoice
+		CMP AL, 1
+		JB rptInvalidChoice
+		CMP AL, 4
+		JA rptInvalidChoice
 		
 		print_Newline
-		MOV choice,AL
+		MOV choice, AL
 		clnScr
-		reportDivider
-		JMP compareChoice
+		JMP rptCmpChoice
 		
-	reportInvalidChoice:
+	rptInvalidChoice:
 		
 		print_Newline
 		
-		MOV AH,09H
-		LEA DX,invalidInputMsg
+		MOV AH, 09H
+		LEA DX, invalidInputMsg
 		INT 21H
 		
 		print_Newline
 		pause
 	
-		JMP reportList
+		JMP rptList
 		
-	compareChoice:
-		CMP choice,1
+	rptCmpChoice:
+		CMP choice, 1
 		JE stockInReport
-		CMP choice,2
+		CMP choice, 2
 		JE stockOutReport
-		CMP choice,3
+		CMP choice, 3
 		JE invStatReport
 		
 		clnScr
-		JMP repMenuEnd
+		JMP rptMenuEnd
 	
 	stockInReport:
-		
-		MOV AH,09H
-		LEA DX,stockInTitle
+		rptDivider
+		MOV AH, 09H
+		LEA DX, stockInTitle
 		INT 21H
+		rptDivider
 		CALL stockReportDetails
-		reportDivider
+		rptDivider
 		pause
 
-		JMP reportList
-		
-	jumpSkip:
-		JMP invStatReport
+		JMP rptList
 
 	stockOutReport:
-	
-		MOV AH,09H
-		LEA DX,stockOutTitle
+		rptDivider
+		MOV AH, 09H
+		LEA DX, stockOutTitle
 		INT 21H
+		rptDivider
 		CALL stockReportDetails
-		reportDivider
+		rptDivider
 		pause
 	
-		JMP reportList
+		JMP rptList
 	
 	invStatReport:
-	
-		MOV AH,09H
-		LEA DX,invStatTitle
+		invDivider
+		MOV AH, 09H
+		LEA DX, invStatTitle
 		INT 21H
+		invDivider
 		CALL stockReportDetails
-		reportDivider
+		invDivider
 		pause
 		
-		JMP reportList
+		JMP rptList
 	
-	repMenuEnd:
+	rptMenuEnd:
 		RET
 	
 reportMenu ENDP

@@ -1,6 +1,6 @@
 .DATA
 	divider db "=============================================================================$"
-
+	
 
 ;------------
 ;This file defines multiple MACROS to reduce code repetitions 
@@ -75,10 +75,18 @@ displayDivider MACRO
 	
 ENDM
 
-reportDivider MACRO
+rptDivider MACRO
 
 	MOV AH,09H
-	LEA DX,repDivider
+	LEA DX,reportDivider
+	INT 21H
+	
+ENDM
+
+invDivider MACRO
+
+	MOV AH,09H
+	LEA DX,invStatusDivider
 	INT 21H
 	
 ENDM

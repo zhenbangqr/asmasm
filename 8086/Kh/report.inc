@@ -1,201 +1,342 @@
 .DATA
-	phoneDetailsTitle DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity", 0DH, 0AH, "$"
-	phoneDetailsTitleDivider DB "===|===============|==========|==========|==========|==========", 0DH, 0AH, "$"
-	phoneStockTotal DB "                                               Total|$"
-	totalStock DW 0
-	totalStockHigh DW 0
-	stockQtyNum DW 0
-	stockQtyNumHigh DW 0
+	stockRptDetails DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity", 0DH, 0AH, "$"
+	stockRptDetailsDivider DB "===|===============|==========|==========|==========|==========", 0DH, 0AH, "$"
+	invStatDetails DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity  |Stock Values", 0DH, 0AH, "$"
+	invStatDetailsDivider DB "===|===============|==========|==========|==========|==========|============", 0DH, 0AH, "$"
+	stockRptTotal DB "                                               Total|$"
+	totalStock DD 0
+	stockValue DD 0
+	stockValueFP DD 0
+	tempStockValue DD 0
+	tempStockValueFP DD 0
 
 .CODE
 
 stockReportDetails PROC
 	
-	reportDivider
-	
-	MOV AH,09H
-	LEA DX,phoneDetailsTitle
+	CMP choice, 3
+	JE displayInvStat
+		
+	MOV AH, 09H
+	LEA DX, stockRptDetails
 	INT 21H
 	
-	MOV AH,09H
-	LEA DX,phoneDetailsTitleDivider
+	MOV AH, 09H
+	LEA DX, stockRptDetailsDivider
 	INT 21H
 	
-	CALL displayDetails
+	JMP detailsNext
 	
-	print_Newline
+	displayInvStat:
+		MOV AH, 09H
+		LEA DX, invStatDetails
+		INT 21H
 	
+		MOV AH, 09H
+		LEA DX, invStatDetailsDivider
+		INT 21H
+	
+	detailsNext:
+		CALL rptDetails
+		print_Newline
 	RET
 	
 stockReportDetails ENDP
 
-displayDetails PROC
+rptDetails PROC
 	
 	CALL openReadStockFile
+	CALL jumpToNextLine
 	
-	readUntilEnd:
+	rptReadStock:
 		CALL readStockDetails
 		INC numStockFound
 		CALL sumOfStock
 		JMP displayReportDetails
 	
-	checkEndOfFile:
+	checkEOF:
 		MOV AX, [SI]
 		CMP AX, 0
-		JE reportFinish
+		JE reportSummary
 		
-		JMP readUntilEnd
+		JMP rptReadStock
 	
 	displayReportDetails:
-	
-		CALL showPhoneDetails
+		CALL rptStockDetails
+		print_Newline
 		
-		JMP checkEndOfFile
+		JMP checkEOF
 	
-	reportFinish:
+	reportSummary:
 		MOV numStockFound, 0
 		CALL closeFile
 		
-		reportDivider
+		CMP choice, 3
+		JE displayInvDivider
 		
-		MOV AH,09H
-		LEA DX,phoneStockTotal
-		INT 21H
+		rptDivider
 		
-		MOV AX, totalStock
-		MOV DX, totalStockHigh
-		CALL displayNumber
+		JMP displayTotalStock
 		
-		MOV totalStock, 0
-		MOV totalStockHigh, 0
+		displayInvDivider:
+			invDivider
 		
-		RET
+		displayTotalStock:
+			MOV AH, 09H
+			LEA DX, stockRptTotal
+			INT 21H
+			
+			MOV BX, 10
+			MOV AX, WORD PTR totalStock
+			MOV DX, WORD PTR totalStock + 2
+			CALL displayNumber
+			CALL fillSpace
+			
+			MOV WORD PTR totalStock, 0
+			MOV WORD PTR totalStock + 2, 0
+		
+		CMP choice, 3
+		JE displaySumOfStockValue
+		
+		JMP reportEnd
+		
+		displaySumOfStockValue:
+			delimiter
+			CALL sumOfStockValue
+		
+		reportEnd:
+			RET
 	
-displayDetails ENDP
+rptDetails ENDP
 
-showPhoneDetails PROC
+rptStockDetails PROC
 
 	MOV AX, WORD PTR numStockFound
-		MOV DX, WORD PTR numStockFound + 2
+	MOV DX, WORD PTR numStockFound + 2
+	CALL displayNumber
+	
+	MOV AH, 02H
+	MOV DL, '.'
+	INT 21H
+	
+	CMP numStockFound, 10
+	JGE formatDoubleDigit
+	
+	formatSingleDigit:
+		space
+	
+	formatDoubleDigit:
+		delimiter
+	
+	MOV AH, 09H
+	LEA DX, Stock.phoneName
+	INT 21H
+	
+	MOV CX, 15
+	LEA DI, Stock.phoneName
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
+	
+	delimiter
+	
+	MOV AH, 09H
+	LEA DX, Stock.phoneRAM
+	INT 21H
+	
+	MOV CX, 10
+	LEA DI, Stock.phoneRAM
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
+	
+	delimiter
+	
+	MOV AH, 09H
+	LEA DX, Stock.phoneROM
+	INT 21H
+	
+	MOV CX, 10
+	LEA DI, Stock.phoneROM
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
+	
+	delimiter
+	
+	MOV AH, 09H
+	LEA DX, Stock.phoneColor
+	INT 21H
+	
+	MOV CX, 10
+	LEA DI, Stock.phoneColor
+	CALL calculateStringLength
+	SUB CX, BX
+	CALL fillSpace
+	
+	delimiter
+	
+	CMP choice,1
+	JE qtyIn
+	CMP choice,2
+	JE qtyOut
+	CMP choice,3
+	JE qtyInv
+	
+	qtyIn:
+		MOV BX,10
+		MOV AX, WORD PTR Stock.totalStockInQty
+		MOV DX, WORD PTR Stock.totalStockInQty + 2
 		CALL displayNumber
+		CALL fillSpace
+		JMP reportDetailsEnd
 		
-		MOV AH, 02H
-		MOV DL, '.'
-		INT 21H
+	qtyOut:
+		MOV BX,10
+		MOV AX, WORD PTR Stock.totalStockOutQty
+		MOV DX, WORD PTR Stock.totalStockOutQty + 2
+		CALL displayNumber
+		CALL fillSpace
+		JMP reportDetailsEnd
 		
-		CMP numStockFound,10
-		JGE numberNoSpace
-		
-		numberSpace:
-			space
-		
-		numberNoSpace:
-			delimiter
-		
-		MOV AH, 09H
-		LEA DX, Stock.phoneName
-		INT 21H
-		
-		delimiter
-		
-		MOV AH, 09H
-		LEA DX, Stock.phoneRAM
-		INT 21H
+	qtyInv:
+		MOV BX,10
+		MOV AX, WORD PTR Stock.phoneQty
+		MOV DX, WORD PTR Stock.phoneQty + 2
+		CALL displayNumber
+		CALL fillSpace
 		
 		delimiter
 		
-		MOV AH, 09H
-		LEA DX, Stock.phoneROM
-		INT 21H
-		
-		delimiter
-		
-		MOV AH, 09H
-		LEA DX, Stock.phoneColor
-		INT 21H
-		
-		delimiter
-		
-		
-		CMP choice,1
-		JE qtyIn
-		CMP choice,2
-		JE qtyOut
-		CMP choice,3
-		JE qtyInv
-		
-		qtyIn:
-			
-		qtyOut:
-			
-		qtyInv:
-			MOV AX, WORD PTR Stock.phoneQty
-			MOV DX, WORD PTR Stock.phoneQty + 2
-			CALL displayNumber
-		
-		print_Newline
-		
+		CALL calStockValues
+	
+	reportDetailsEnd:
 		RET
 	
-showPhoneDetails ENDP
+rptStockDetails ENDP
 
 sumOfStock PROC
-	; Accumulate phoneQty into totalStock
-	MOV AX, WORD PTR Stock.phoneQty
-	ADD totalStock, AX
 
-	; If there's a high part, accumulate it
-	MOV DX, WORD PTR Stock.phoneQty + 2
-	ADD totalStockHigh, DX
+	CMP choice, 1
+	JE calQtyStockIn
+	CMP choice, 2
+	JE calQtyStockOut
+	CMP choice, 3
+	JE calQtyInvStat
+	
+	calQtyStockIn:
+		MOV AX, WORD PTR Stock.totalStockInQty
+		MOV DX, WORD PTR Stock.totalStockInQty + 2
+	
+	JMP finalCal
+	
+	calQtyStockOut:
+		MOV AX, WORD PTR Stock.totalStockOutQty
+		MOV DX, WORD PTR Stock.totalStockOutQty + 2
+	
+	JMP finalCal
+	
+	calQtyInvStat:
+		MOV AX, WORD PTR Stock.phoneQty
+		MOV DX, WORD PTR Stock.phoneQty + 2
+	
+	finalCal:
+		ADD WORD PTR totalStock, AX
+		ADD WORD PTR totalStock + 2, DX
 	
 	RET
 
 sumOfStock ENDP
 
-compareQty PROC
-	CALL openReadStockFile
-	CALL readStockDetails
+calStockValues PROC
 	
-	MOV AX, WORD PTR Stock.phoneQty  
-	MOV DX, WORD PTR Stock.phoneQty + 2
-	MOV stockQtyNum, AX
-	MOV stockQtyNumHigh, DX
+	MOV AX, WORD PTR Stock.phonePrice
+	MOV DX, WORD PTR Stock.phonePrice + 2
 	
-	compareNextQty:
-		CALL readStockDetails
+	MUL WORD PTR Stock.phoneQty
 	
-		MOV BX, WORD PTR Stock.phoneQty  
-		MOV CX, WORD PTR Stock.phoneQty + 2
+	ADD WORD PTR stockValue, AX
+	ADD WORD PTR stockValue + 2, DX
 	
-		CMP CX, stockQtyNumHigh
-		JB smallerNum
-		CMP BX, stockQtyNum
-		JB smallerNum
+	MOV WORD PTR tempStockValue, AX
+	MOV WORD PTR tempStockValue + 2, DX
 	
-		MOV stockQtyNum,BX
-		MOV stockQtyNumHigh,CX
+	MOV AX, WORD PTR Stock.phonePriceFP
+	MOV DX, WORD PTR Stock.phonePriceFP + 2
 	
-	smallerNum:
+	MUL WORD PTR Stock.phoneQty
+	DIV hundred16bits
+	
+	ADD WORD PTR stockValue, AX
+	ADD WORD PTR tempStockValue, AX
+	MOV WORD PTR tempStockValueFP, DX
+	
+	ADD WORD PTR stockValueFP, DX
+	
+	
+	MOV AX, WORD PTR tempStockValue
+	MOV DX, WORD PTR tempStockValue + 2
+	CALL displayNumber
+	
+	MOV AH, 02H
+	MOV DL, '.'
+	INT 21H
+	
+	MOV AX, WORD PTR tempStockValueFP
+	MOV DX, WORD PTR tempStockValueFP + 2
+	CALL displayFloatingPoint
+	
+	RET
+	
+calStockValues ENDP
 
-		MOV AX, [SI]
-		CMP AX, 0
-		JE compareQtyDone
-		
-		JMP compareNextQty
-		
-	compareQtyDone:
-		CALL closeFile
-		
-		MOV AH,09H
-		LEA DX,highestStockOut
-		INT 21H
-		
-		MOV AX, stockQtyNum
-		MOV DX, stockQtyNumHigh
-		CALL displayNumber
-		
-		print_Newline
-
-		RET
+sumOfStockValue PROC
 	
-compareQty ENDP
+	MOV AX, WORD PTR stockValueFP
+	MOV DX, WORD PTR stockValueFP + 2
+	
+	DIV hundred16bits
+	
+	ADD WORD PTR stockValue, AX
+	MOV WORD PTR stockValueFP, DX
+	
+	MOV AX, WORD PTR stockValue
+	MOV DX, WORD PTR stockValue + 2
+	CALL displayNumber
+	
+	MOV AH, 02H
+	MOV DL, '.'
+	INT 21H
+	
+	MOV AX, WORD PTR stockValueFP
+	MOV DX, WORD PTR stockValueFP + 2
+	CALL displayFloatingPoint
+	
+	MOV WORD PTR stockValue, 0
+	MOV WORD PTR stockValue + 2, 0
+	
+	MOV WORD PTR stockValueFP, 0
+	MOV WORD PTR stockValueFP + 2, 0
+	
+	RET
+	
+sumOfStockValue ENDP
+
+displayFloatingPoint PROC
+
+	DIV ten8Bits
+	MOV BX, AX
+	
+	MOV AH, 02H
+	MOV DL, BL
+	ADD DL, 30H
+	INT 21H
+	
+	MOV AH, 02H
+	MOV DL, BH
+	ADD DL, 30H
+	INT 21H
+	
+	RET
+	
+displayFloatingPoint ENDP
