@@ -1,9 +1,17 @@
 .DATA
     stockFileName DB 'Phone.txt', 0
     staffFileName DB 'staff.txt', 0
-    buffer DW 1024 DUP(?)    ; Buffer to store file content
+    readBuffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
 	fileErrorMsg DB "Error Occured!$"
+	
+	
+	inputNumber LABEL BYTE
+		numberLength DB 3
+		numberActNum DB ?
+		numberInputed DB 3 DUP("$")
+	
+	quantity DD ?
 .code
 
 ;--------------------------------------------
@@ -13,20 +21,20 @@
 openReadStaffFile PROC
 
 	MOV AH, 3DH					;Open file
-	MOV AL, 0					;Open for reading
+	MOV AL, 2					;Open for reading and writing
 	MOV DX, OFFSET staffFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
-	LEA DX, buffer				;Address for buffer
+	LEA DX, readBuffer				;Address for buffer
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	
-	LEA SI, buffer
+	LEA SI, readBuffer
 	
 	RET
 
@@ -40,20 +48,20 @@ openReadStaffFile ENDP
 openReadStockFile PROC
 
 	MOV AH, 3DH					;Open file
-	MOV AL, 0					;Open for reading
+	MOV AL, 2					;Open for reading and writing
 	MOV DX, OFFSET stockFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
-	LEA DX, buffer				;Address for buffer
+	LEA DX, readBuffer				;Address for buffer
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	
-	LEA SI, buffer
+	LEA SI, readBuffer
 	
 	RET
 
@@ -233,16 +241,16 @@ readStockDetails PROC
 	CALL readStockPrice
 	
 	CALL readNumber
-	MOV WORD PTR [Stock.phoneQty], AX
-	MOV WORD PTR [Stock.phoneQty + 2], DX
+	MOV WORD PTR Stock.phoneQty, AX
+	MOV WORD PTR Stock.phoneQty + 2, DX
 	
 	CALL readNumber
-	MOV WORD PTR [Stock.totalStockInQty], AX
-	MOV WORD PTR [Stock.totalStockInQty + 2], DX
+	MOV WORD PTR Stock.totalStockInQty, AX
+	MOV WORD PTR Stock.totalStockInQty + 2, DX
 	
 	CALL readNumber
-	MOV WORD PTR [Stock.totalStockOutQty], AX
-	MOV WORD PTR [Stock.totalStockOutQty + 2], DX
+	MOV WORD PTR Stock.totalStockOutQty, AX
+	MOV WORD PTR Stock.totalStockOutQty + 2, DX
 
 	
 	CALL jumpToNextLine
@@ -317,3 +325,88 @@ calculateStringLength PROC
 	
 calculateStringLength ENDP
 
+;----------------------------------------------------------
+;	inputQuantity
+;	input and check whether the input is all digit or not
+;----------------------------------------------------------
+inputQuantity PROC
+	MOV AH, 0AH
+	LEA DX, inputNumber
+	INT 21H
+	
+	print_NewLine
+	
+	CALL checkIsDigit
+	
+	RET
+inputQuantity ENDP
+
+;-----------------------------------------------------------
+;	checkIsDigit
+;	checkWhether a string enter is all digit
+;-----------------------------------------------------------
+checkIsDigit PROC
+	MOV DI, 2
+	
+	cmpIsDigit:
+		MOV AL, inputNumber[DI]
+		
+		CMP AL, 0DH
+		JE isDigit
+		CMP AL, '$'
+		JE isDigit
+		
+		CMP AL, '0'
+		JB notDigit
+		CMP AL, '9'
+		JA notDigit
+	
+		INC DI
+	
+		JMP cmpIsDigit
+	
+	notDigit:
+		MOV digitValidate, 0
+		RET
+
+	isDigit:
+		MOV digitValidate, 1
+		RET
+	
+checkIsDigit ENDP
+
+;----------------------------------------
+;	stringToNumber
+;	convert string become number
+;----------------------------------------
+stringToNumber PROC
+	resetAX
+	resetBX
+	resetCX
+	resetDX
+	
+	MOV BL, [DI]
+	SUB BL, 30H
+	
+	MOV AX, BX
+	INC DI
+	
+	continueConvertNumber:
+		MOV BL, [DI]
+		CMP BL,	0DH
+		JE endConvertNumber
+		CMP BL,	'$'
+		JE endConvertNumber
+		
+		MUL ten16Bits
+		SUB BL, 30H
+		ADD AX, BX
+		
+		INC DI
+		
+		JMP continueConvertNumber
+	
+	endConvertNumber:
+		RET
+
+stringToNumber ENDP

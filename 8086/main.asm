@@ -7,11 +7,10 @@
     choice DB ?
 	searchCheck DB 0
 	numStockFound DB 0
-	loginCheck DB 0
-	eofHolder DW ?
+	digitValidate DB 1
     newLine DB 0DH,0AH,"$"    ; Newline definition
 	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"  	
-	MSG1 db "STOCK IN$"
+	MSG1 db "Enter stock in quantity: $"
 	MSG2 db "STOCK OUT$"
 	MSG3 db "SEARCH$"
 	MSG4 db "GENERATE$"
@@ -46,6 +45,7 @@ INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
+INCLUDE Fs\test.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
@@ -54,12 +54,15 @@ MAIN PROC
     MOV AX,@DATA
     MOV DS,AX
 
-loginLoop:
+mainPageLoop:
 	CALL loginPage
 	
-	CMP choice, 2
-	JE exitProgram
+	CMP choice, 1
+	JE loginLoop
 	
+	JMP exitProgram
+	
+loginLoop:
 	CALL user_login
 	
 menuLoop:
@@ -78,25 +81,11 @@ menuLoop:
 	
     JMP logOut
 
-
-logOut:
-	CALL logOutComfirm
+generateReport:
+    ; Code for Generate Report
+	CALL reportMenu
 	
-	CMP choice, 2
-	JE menuLoop
-	JMP loginLoop
-
-stockIn:
-    ; Code for Stock In
-	MOV AH,09H
-    LEA DX, MSG1
-    INT 21H
-	
-	MOV AH, 09H
-    LEA DX, newLine
-    INT 21H
-	
-	JMP menuLoop
+    JMP menuLoop
 
 stockOut:
     ; Code for Stock Out
@@ -110,12 +99,6 @@ stockOut:
 	
     JMP menuLoop
 
-generateReport:
-    ; Code for Generate Report
-	CALL reportMenu
-	
-    JMP menuLoop
-
 searchStock:
     ; Code for Search Stock
 	searchStockLoop:
@@ -126,10 +109,57 @@ searchStock:
 		JE menuLoop
 		
 		CALL inputAndSearch
-		
 		CALL closeFile
 		JMP searchStockLoop
 
+logOut:
+	CALL logOutComfirm
+	
+	CMP choice, 2
+	JE menuLoop
+	JMP mainPageLoop
+
+stockIn:
+    ; Code for Stock In
+	enterStockInQty:
+		MOV AH,09H
+		LEA DX, MSG1
+		INT 21H
+	
+		CALL inputQuantity
+		
+		CMP digitValidate, 0
+		JE invalidQtyInput
+		
+		resetAX
+		resetDX
+		MOV DI, OFFSET numberInputed
+		CALL stringToNumber
+		MOV WORD PTR quantity, AX
+		MOV WORD PTR quantity + 2, DX
+		
+		
+		MOV AX, WORD PTR quantity
+		MOV DX, WORD PTR quantity + 2
+		CALL displayNumber
+		
+		print_NewLine
+		
+		JMP menuLoop
+	
+	InvalidQtyInput:
+		MOV AH, 09H
+		LEA DX, invalidInputMsg
+		INT 21H
+    
+		MOV AH, 09H
+		LEA DX, newLine
+		INT 21H
+		
+		pause
+		clnScr
+		
+		JMP enterStockInQty
 
 exitProgram:
 	MOV AH,09H
