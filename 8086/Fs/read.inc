@@ -21,7 +21,7 @@
 openReadStaffFile PROC
 
 	MOV AH, 3DH					;Open file
-	MOV AL, 2					;Open for reading
+	MOV AL, 0					;Open for reading
 	MOV DX, OFFSET staffFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
@@ -34,6 +34,7 @@ openReadStaffFile PROC
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	
+	MOV SI, 0
 	LEA SI, readBuffer
 	
 	RET
@@ -73,10 +74,14 @@ openReadStockFile ENDP
 ;	close the stock file(Phone.txt)
 ;------------------------------------------------------
 closeFile PROC
+	CALL clearReadFileBuffer
+	
 	mov bx, fileHandle
     mov ah, 3Eh             ; DOS function: close file
     int 21h
     jc fileError            ; If carry flag is set, an error occurred
+
+	mov fileHandle, 0
 	
 	RET
 closeFile ENDP
@@ -113,6 +118,8 @@ readStringFromFile PROC
 		JMP continueReadString
 			
 	endReadString:
+		MOV AL, '$'
+		MOV [DI], AL
 		INC SI
 		RET
 	
@@ -252,7 +259,6 @@ readStockDetails PROC
 	MOV WORD PTR Stock.totalStockOutQty, AX
 	MOV WORD PTR Stock.totalStockOutQty + 2, DX
 
-	
 	CALL jumpToNextLine
 	
 	RET
@@ -411,34 +417,64 @@ stringToNumber PROC
 
 stringToNumber ENDP
 
+
+
 clearReadBuffer PROC
+	MOV CX, 20
     MOV AL, 0             ; Value to fill the buffer (zero in this case)
 clearBufferLoop:
-	MOV AH, [DI]
-	CMP AH, "$"
-	JE endClearBufferLoop
-	
-	CMP AH, 0DH
-	JE endClearBufferLoop
-	
     MOV [DI], AL          ; Store value AL at address DI
-    INC DI                ; Move to the next byte
-    JMP clearBufferLoop
+    INC DI     	          ; Move to the next byte
+    LOOP clearBufferLoop
 	
-endClearBufferLoop:
 	RET
 	
 clearReadBuffer ENDP
 
+
+
 clearStockVariableBuffer PROC
+
 	LEA DI, Stock.phoneName
 	CALL clearReadBuffer
+	
 	LEA DI, Stock.phoneRAM
 	CALL clearReadBuffer
+	
 	LEA DI, Stock.phoneROM
 	CALL clearReadBuffer
+	
 	LEA DI, Stock.phoneColor
 	CALL clearReadBuffer
+
+	MOV AX, 0
+	MOV WORD PTR Stock.phonePrice, AX
+	MOV WORD PTR Stock.phonePrice + 2, AX
+
+	MOV WORD PTR Stock.phonePriceFP, AX
+	MOV WORD PTR Stock.phonePriceFP + 2, AX
+
+	MOV WORD PTR Stock.phoneQty, AX
+	MOV WORD PTR Stock.phoneQty + 2, AX
+
+	MOV WORD PTR Stock.totalStockInQty, AX
+	MOV WORD PTR Stock.totalStockInQty + 2, AX
+
+	MOV WORD PTR Stock.totalStockOutQty, AX
+	MOV WORD PTR Stock.totalStockOutQty + 2, AX
 	
 	RET
 clearStockVariableBuffer ENDP
+
+clearReadFileBuffer PROC
+	;clear the Buffer
+		MOV CX, 1024  ; Buffer size
+		LEA DI, readBuffer
+		MOV AL, 0
+	clearReadBufferLoop:
+		MOV [DI], AL
+		INC DI
+		LOOP clearReadBufferLoop
+		
+	RET
+clearReadFileBuffer ENDP

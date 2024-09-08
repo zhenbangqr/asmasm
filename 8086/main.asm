@@ -17,17 +17,17 @@
 	MSG5 db "EXIT$"
 
 	user STRUC
-		userID DB 20 DUP('$')
-		userPw DB 20 DUP('$')
+		userID DB 20 DUP(?)
+		userPw DB 20 DUP(?)
 	user ENDS
 	
 	Staff user<>
 
 	phone STRUC
-		phoneName DB 20 DUP('$')
-		phoneRAM DB 20 DUP('$')
-		phoneROM DB 20 DUP('$')
-		phoneColor DB 20 DUP('$')
+		phoneName DB 20 DUP(?)
+		phoneRAM DB 20 DUP(?)
+		phoneROM DB 20 DUP(?)
+		phoneColor DB 20 DUP(?)
 		phonePrice DD ?
 		phonePriceFP DD ?
 		phoneQty DD ?
@@ -45,7 +45,7 @@ INCLUDE Fs\menu.inc
 INCLUDE Fs\search.inc
 INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
-INCLUDE Fs\test.inc
+INCLUDE Fs\write.inc
 INCLUDE Simon\login.inc
 INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
@@ -109,9 +109,6 @@ searchStock:
 		JE menuLoop
 		
 		CALL inputAndSearch
-		CALL closeFile
-		CALL closeWriteFile
-		;CALL switchStockFileName
 		JMP searchStockLoop
 
 logOut:
@@ -123,31 +120,47 @@ logOut:
 
 stockIn:
     ; Code for Stock In
-	enterStockInQty:
-		MOV AH,09H
-		LEA DX, MSG1
-		INT 21H
+	CALL openWriteStockFile
+	CALL writeStockFileTitle
 	
-		CALL inputQuantity
+	CALL openReadStockFile
+	CALL jumpToNextLine
+	stockInProcess:
+		CALL clearStockVariableBuffer
+		CALL readStockDetails
 		
-		CMP digitValidate, 0
-		JE invalidQtyInput
+	enterStockInQty:
+		;MOV AH,09H
+		;LEA DX, MSG1
+		;INT 21H
+	
+		;CALL inputQuantity
 		
-		resetAX
-		resetDX
-		MOV DI, OFFSET numberInputed
-		CALL stringToNumber
-		MOV WORD PTR quantity, AX
-		MOV WORD PTR quantity + 2, DX
+		;CMP digitValidate, 0
+		;JE invalidQtyInput
 		
-		
-		MOV AX, WORD PTR quantity
-		MOV DX, WORD PTR quantity + 2
-		CALL displayNumber
-		
-		print_NewLine
-		
-		JMP menuLoop
+		;resetAX
+		;resetDX
+		;MOV DI, OFFSET numberInputed
+		;CALL stringToNumber
+		MOV AX, 55
+		MOV DX, 0
+		MOV WORD PTR Stock.totalStockInQty, AX
+		MOV WORD PTR Stock.totalStockInQty + 2, DX
+
+	CALL appendToBuffer
+	
+	MOV AL, [SI]
+	CMP AX, 0
+	JE endStockIn
+	
+	JMP stockInProcess
+	
+	endStockIn:
+	CALL closeFile
+	CALL closeWriteFile
+	;CALL switchStockFileName   ;havent done yet
+	JMP menuLoop
 	
 	InvalidQtyInput:
 		MOV AH, 09H
