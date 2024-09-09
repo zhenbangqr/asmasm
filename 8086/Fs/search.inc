@@ -214,6 +214,7 @@ compareExactString PROC
 	LOOP phoneNameCompareLoop
 	
 	MOV searchCheck, 1
+	INC numStockFound
 	
 finishCompare:
 	RET

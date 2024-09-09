@@ -7,8 +7,6 @@
 		numberLength DB 3
 		numberActNum DB ?
 		numberInputed DB 3 DUP("$")
-	
-	quantity DD ?
 .CODE
 stockInMenu PROC
 	print_NewLine
@@ -67,7 +65,7 @@ compareAndStockIn PROC
 		
 		MOV AL, [SI]
 		CMP AX, 0
-		JE endStockIn
+		JE checkSearchStockInResult
 	
 		JMP searchStockIn
 		
@@ -79,7 +77,7 @@ compareAndStockIn PROC
 		CALL inputQuantity
 		
 		CMP digitValidate, 0
-		JE invalidQtyInput
+		JE invalidStockInQtyInput
 
 		LEA DI, numberInputed
 		CALL stringToNumber
@@ -101,8 +99,14 @@ compareAndStockIn PROC
 		pause
 		clnScr
 		RET
+		
+	checkSearchStockInResult:
+		CMP numStockFound, 0
+		JE noStockInMsg
+		print_NewLine
+		JMP endStockIn
 	
-	InvalidQtyInput:
+	invalidStockInQtyInput:
 		MOV AH, 09H
 		LEA DX, invalidInputMsg
 		INT 21H
@@ -115,12 +119,6 @@ compareAndStockIn PROC
 		clnScr
 
 		JMP enterStockInQty
-	
-	checkSearchResult:
-		CMP numStockFound, 0
-		JE noStockInMsg
-		print_NewLine
-		JMP endStockIn
 	
 	noStockInMsg:
 		MOV AH, 09H

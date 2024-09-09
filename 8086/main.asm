@@ -47,6 +47,7 @@ INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
 INCLUDE Fs\write.inc
 INCLUDE Simon\login.inc
+INCLUDE Simon\stockOut.inc
 INCLUDE Zb\stockIn.inc
 INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
@@ -89,16 +90,18 @@ generateReport:
     JMP menuLoop
 
 stockOut:
-    ; Code for Stock Out
-	MOV AH,09H
-    LEA DX, MSG2
-    INT 21H
-	
-	MOV AH, 09H
-    LEA DX, newLine
-    INT 21H
-	
-    JMP menuLoop
+	stockOutProcess:
+		MOV numStockFound, 0
+		CALL stockOutMenu
+		
+		CMP choice, 2
+		JE menuLoop
+		
+		CALL compareAndStockOut
+		CALL closeFile
+		CALL closeWriteFile
+		;CALL switchStockFileName   ;havent done yet
+		JMP stockOutProcess
 
 searchStock:
     ; Code for Search Stock
