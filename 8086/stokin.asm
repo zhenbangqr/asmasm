@@ -123,6 +123,16 @@ update_Qty:
     mov dx, [si + offset_stock_in]
     add dx, bx
     mov [si + offset_stock_in], dx
+	
+remove_Qty:
+    mov cx, [si + offset_qty]
+    sub cx, ax
+    mov [si + offset_qty], cx
+
+    ; Increase StockInQty
+    mov dx, [si + offset_stock_in]
+    sub dx, bx
+    mov [si + offset_stock_in], dx
 
 write_to_file proc
     ; Write user input to file
