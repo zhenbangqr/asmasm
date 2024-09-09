@@ -19,10 +19,7 @@
 searchMenu PROC
 
 nextStepChoiceLoop:
-	;New Line
-	MOV AH, 09H
-	LEA DX, newLine
-	INT 21H
+	print_NewLine
 	
 	MOV AH, 09H
 	LEA DX, nextStepPrompt
@@ -144,6 +141,7 @@ searchPhoneStock PROC
 searchPhoneStock ENDP
 
 
+
 ;--------------------------------------------------------------
 ;	cmpString
 ;	compare the string read from file with the entered string
@@ -185,7 +183,41 @@ finish:
 	RET
 cmpString ENDP
 
+;--------------------------------------------------------------
+;	compareExactString
+;	compare the string to find the string that are exact same
+;--------------------------------------------------------------
+compareExactString PROC
+	MOV searchCheck, 0
+	getPhoneNameLength:
+		MOV DI,OFFSET Stock.phoneName
+		CALL calculateStringLength
+		JMP compareTwoPhoneNameLength
+	
+	compareTwoPhoneNameLength:
+		MOV BH,searchInput[1]
+		CMP BL,BH
+		JNE finishCompare
 
+		resetCX
+		MOV CL,BL
+		MOV BX, 2
+		MOV DI, 0
+		
+	phoneNameCompareLoop:
+		MOV AL,searchInput[BX]
+		CMP AL,Stock.phoneName[DI]
+		JNE failCompare
+		
+		INC BX
+		INC DI
+	LOOP phoneNameCompareLoop
+	
+	MOV searchCheck,1
+	
+finishCompare:
+	RET
+compareExactString ENDP
 
 	
 	

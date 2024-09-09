@@ -4,14 +4,6 @@
     readBuffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
 	fileErrorMsg DB "Error Occured!$"
-	
-	
-	inputNumber LABEL BYTE
-		numberLength DB 3
-		numberActNum DB ?
-		numberInputed DB 3 DUP("$")
-	
-	quantity DD ?
 .code
 
 ;--------------------------------------------

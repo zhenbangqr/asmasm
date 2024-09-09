@@ -47,6 +47,7 @@ INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
 INCLUDE Fs\write.inc
 INCLUDE Simon\login.inc
+INCLUDE Zb\stockIn.inc
 INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
 
@@ -109,6 +110,7 @@ searchStock:
 		JE menuLoop
 		
 		CALL inputAndSearch
+		CALL closeFile
 		JMP searchStockLoop
 
 logOut:
@@ -119,62 +121,18 @@ logOut:
 	JMP mainPageLoop
 
 stockIn:
-    ; Code for Stock In
-	CALL openWriteStockFile
-	CALL writeStockFileTitle
-	
-	CALL openReadStockFile
-	CALL jumpToNextLine
 	stockInProcess:
-		CALL clearStockVariableBuffer
-		CALL readStockDetails
+		MOV numStockFound, 0
+		CALL stockInMenu
 		
-	enterStockInQty:
-		;MOV AH,09H
-		;LEA DX, MSG1
-		;INT 21H
-	
-		;CALL inputQuantity
+		CMP choice, 2
+		JE menuLoop
 		
-		;CMP digitValidate, 0
-		;JE invalidQtyInput
-		
-		;resetAX
-		;resetDX
-		;MOV DI, OFFSET numberInputed
-		;CALL stringToNumber
-		MOV AX, 55
-		MOV DX, 0
-		MOV WORD PTR Stock.totalStockInQty, AX
-		MOV WORD PTR Stock.totalStockInQty + 2, DX
-
-	CALL appendToBuffer
-	
-	MOV AL, [SI]
-	CMP AX, 0
-	JE endStockIn
-	
-	JMP stockInProcess
-	
-	endStockIn:
-	CALL closeFile
-	CALL closeWriteFile
-	;CALL switchStockFileName   ;havent done yet
-	JMP menuLoop
-	
-	InvalidQtyInput:
-		MOV AH, 09H
-		LEA DX, invalidInputMsg
-		INT 21H
-    
-		MOV AH, 09H
-		LEA DX, newLine
-		INT 21H
-		
-		pause
-		clnScr
-		
-		JMP enterStockInQty
+		CALL compareAndStockIn
+		CALL closeFile
+		CALL closeWriteFile
+		;CALL switchStockFileName   ;havent done yet
+		JMP stockInProcess
 
 exitProgram:
 	MOV AH,09H
