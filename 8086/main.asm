@@ -47,6 +47,7 @@ INCLUDE Fs\read.inc
 INCLUDE Fs\display.inc
 INCLUDE Fs\write.inc
 INCLUDE Simon\login.inc
+INCLUDE Simon\stockOut.inc
 INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
 
