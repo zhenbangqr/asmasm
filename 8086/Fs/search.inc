@@ -190,13 +190,13 @@ cmpString ENDP
 compareExactString PROC
 	MOV searchCheck, 0
 	getPhoneNameLength:
-		MOV DI,OFFSET Stock.phoneName
+		MOV DI, OFFSET Stock.phoneName
 		CALL calculateStringLength
 		JMP compareTwoPhoneNameLength
 	
 	compareTwoPhoneNameLength:
-		MOV BH,searchInput[1]
-		CMP BL,BH
+		MOV BH, searchInput[1]
+		CMP BL, BH
 		JNE finishCompare
 
 		resetCX
@@ -205,15 +205,15 @@ compareExactString PROC
 		MOV DI, 0
 		
 	phoneNameCompareLoop:
-		MOV AL,searchInput[BX]
-		CMP AL,Stock.phoneName[DI]
-		JNE failCompare
+		MOV AL, searchInput[BX]
+		CMP AL, Stock.phoneName[DI]
+		JNE finishCompare
 		
 		INC BX
 		INC DI
 	LOOP phoneNameCompareLoop
 	
-	MOV searchCheck,1
+	MOV searchCheck, 1
 	
 finishCompare:
 	RET

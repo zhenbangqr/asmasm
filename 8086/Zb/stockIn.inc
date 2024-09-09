@@ -59,7 +59,6 @@ compareAndStockIn PROC
 	searchStockIn:
 		CALL clearStockVariableBuffer
 		CALL readStockDetails
-		MOV searchCheck, 0
 		CALL compareExactString
 		CMP searchCheck, 1
 		JE enterStockInQty
@@ -73,7 +72,7 @@ compareAndStockIn PROC
 		JMP searchStockIn
 		
 	enterStockInQty:
-		MOV AH,09H
+		MOV AH, 09H
 		LEA DX, promptStockInQty
 		INT 21H
 	
