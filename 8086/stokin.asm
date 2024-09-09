@@ -114,6 +114,16 @@ get_input proc
     ret
 get_input endp
 
+update_Qty:
+    mov cx, [si + offset_qty]
+    add cx, ax
+    mov [si + offset_qty], cx
+
+    ; Increase StockInQty
+    mov dx, [si + offset_stock_in]
+    add dx, bx
+    mov [si + offset_stock_in], dx
+
 write_to_file proc
     ; Write user input to file
     mov ah, 40h
