@@ -19,8 +19,6 @@
 searchMenu PROC
 
 nextStepChoiceLoop:
-	print_NewLine
-	
 	MOV AH, 09H
 	LEA DX, nextStepPrompt
 	INT 21H
@@ -72,15 +70,15 @@ inputAndSearch PROC
 	JMP compareStringLoop
 
 	compareStringLoop:
+		MOV AX, [SI]
+		CMP AX, 0
+		JE checkSearchResultEqlZero
+		
 		CALL clearStockVariableBuffer
 		CALL readStockDetails
 		CALL cmpString
 		CMP searchCheck, 1
 		JE displayResult
-
-		MOV AX, [SI]
-		CMP AX, 0
-		JE checkSearchResultEqlZero
 		
 		JMP compareStringLoop
 	

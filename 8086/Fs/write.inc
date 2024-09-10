@@ -1,30 +1,39 @@
 .data  
 	stockFileTitle DB "Name;RAM;ROM;Color;Price;Qty;StockInQty;StockOutQty;$"
 
+	errorMsg DB "Error find file$"
+
 	writeBuffer DB 1024 DUP(?)    ; Buffer to store file content
 	bufferLength DW ?
 	bufferIndex DW 0
-	tempFileName DB "temp.txt"
+	tempFileName DB 'temp.txt', 0
 	fileHandleWrite DW ?         ; To store the file handle
 .code
 
+openWriteTempFile PROC
+	MOV AH, 3DH					;Open file
+	MOV AL, 1					;Open for write
+	MOV DX, OFFSET tempFileName
+	INT 21H
+	mov fileHandleWrite, AX			;Store File Handle
+	
+	RET
+openWriteTempFile ENDP
+
 openWriteStockFile PROC
 	MOV AH, 3DH					;Open file
-	MOV AL, 2					;Open for write
-	MOV DX, OFFSET tempFileName
+	MOV AL, 1					;Open for write
+	MOV DX, OFFSET stockFileName
 	INT 21H
 	mov fileHandleWrite, AX			;Store File Handle
 	
 	RET
 openWriteStockFile ENDP
 
-
 closeWriteFile PROC
 	MOV BX, fileHandleWrite
 	MOV AH, 3EH
 	INT 21H
-	
-	MOV fileHandleWrite, 0
 	
 	RET
 closeWriteFile ENDP
@@ -249,28 +258,41 @@ appendNumber ENDP
 ;	change the new file name and clear the older one
 ;----------------------------------------------------
 updateStockFileName PROC
-	MOV AH, 56h          ; DOS function to rename a file
-    LEA DX, tempFileName  ; Address of the current file name
-    LEA DI, stockFileName ; Address of the new file name
-    INT 21H              ; Call DOS
+	CALL openWriteStockFile
+	CALL writeStockFileTitle
 	
-	RET
+	CALL openReadTempFile
+	CALL jumpToNextLine
+	
+	writeBackToOriginFile:
+		MOV AL, [SI]
+		CMP AX, 0
+		JE endWriteBackToOrigin
+		
+		CALL clearStockVariableBuffer
+		CALL readStockDetails
+		CALL appendToBuffer
+		JMP writeBackToOriginFile
+		
+	endWriteBackToOrigin:
+		CALL closeWriteFile
+		CALL closeFile
+		MOV AH, 41h        	  ; DOS function to delete a file
+		LEA DX, tempFileName ; Address of file to delete (Phone.txt)
+		INT 21H            	  ; Call DOS
+
+		MOV AH, 3Ch         ; DOS function to create a file
+		LEA DX, tempFileName ; Address of the file name
+		MOV CX, 0           ; File attributes (0 = normal file)
+		INT 21H             ; Call DOS interrupt
+	
+	done:
+		RET
+	
+	handleError:
+    ; Handle the error (you can print an error message or take appropriate action)
+    MOV AH, 09h          ; Print error message
+    LEA DX, errorMsg
+    INT 21H
+
 updateStockFileName ENDP
-
-
-switchStockFileName PROC
-	CALL updateStockFileName
-	
-	MOV AH, 3Dh          ; DOS function to open a file
-    LEA DX, tempFileName     ; Address of the file name
-    MOV AL, 1            ; Open for write access (truncates the file)
-    INT 21H              ; Call DOS
-
-; Close the file (finalize truncation)
-    MOV AH, 3Eh          ; DOS function to close a file
-    MOV BX, AX           ; File handle from the open operation
-    INT 21H              ; Call DOS
-
-
-	RET
-switchStockFileName ENDP

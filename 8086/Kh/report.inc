@@ -49,6 +49,7 @@ rptDetails PROC
 	CALL jumpToNextLine
 	
 	rptReadStock:
+		CALL clearStockVariableBuffer
 		CALL readStockDetails
 		INC numStockFound
 		CALL sumOfStock
@@ -110,23 +111,26 @@ rptDetails PROC
 rptDetails ENDP
 
 rptStockDetails PROC
-
-	MOV AX, WORD PTR numStockFound
-	MOV DX, WORD PTR numStockFound + 2
-	CALL displayNumber
+	MOV AX, 0
+	MOV AL, numStockFound
+	DIV ten8Bits
+	
+	MOV BX, AX
+	MOV AH, 02H
+	MOV DL, BL
+	ADD DL, 30H
+	INT 21H
+	
+	MOV AH, 02H
+	MOV DL, BH
+	ADD DL, 30H
+	INT 21H
 	
 	MOV AH, 02H
 	MOV DL, '.'
 	INT 21H
-	
-	CMP numStockFound, 10
-	JGE formatDoubleDigit
-	
-	formatSingleDigit:
-		space
-	
-	formatDoubleDigit:
-		delimiter
+		
+	delimiter
 	
 	MOV AH, 09H
 	LEA DX, Stock.phoneName

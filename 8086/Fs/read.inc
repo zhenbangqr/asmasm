@@ -48,7 +48,7 @@ openReadStockFile PROC
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
-	LEA DX, readBuffer				;Address for buffer
+	LEA DX, readBuffer			;Address for buffer
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
@@ -59,6 +59,33 @@ openReadStockFile PROC
 	RET
 
 openReadStockFile ENDP
+
+;--------------------------------------------
+;	openReadTempFile
+;	open the stock file(temp.txt) for read
+;--------------------------------------------
+openReadTempFile PROC
+
+	MOV AH, 3DH					;Open file
+	MOV AL, 0					;Open for reading
+	MOV DX, OFFSET tempFileName
+	INT 21H
+	JC fileError				;Jump when carry flag set(error when open file)
+	mov fileHandle, AX			;Store File Handle
+	
+	MOV BX, fileHandle			;Use the fileHandle
+	LEA DX, readBuffer			;Address for buffer
+	MOV CX, 1024				;Read 1024 bytes
+	MOV AH, 3FH					;Read File
+	INT 21H
+	JC fileError				;Jump when carry flag set(error when open file)
+	
+	LEA SI, readBuffer
+	
+	RET
+
+openReadTempFile ENDP
+
 
 
 ;------------------------------------------------------
@@ -72,8 +99,6 @@ closeFile PROC
     mov ah, 3Eh             ; DOS function: close file
     int 21h
     jc fileError            ; If carry flag is set, an error occurred
-
-	mov fileHandle, 0
 	
 	RET
 closeFile ENDP

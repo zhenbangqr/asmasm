@@ -5,8 +5,6 @@
 	notEnoughStock DB "Stock No Enough!$"
 .CODE
 stockOutMenu PROC
-	print_NewLine
-	
 	MOV AH, 09H
 	LEA DX, continueStockOutPrompt
 	INT 21H
@@ -42,7 +40,7 @@ stockOutMenu PROC
 stockOutMenu ENDP
 
 compareAndStockOut PROC
-	CALL openWriteStockFile
+	CALL openWriteTempFile
 	CALL writeStockFileTitle
 	
 	CALL openReadStockFile
@@ -51,6 +49,10 @@ compareAndStockOut PROC
 	CALL searchPhoneStock
 	
 	searchStockOut:
+		MOV AL, [SI]
+		CMP AX, 0
+		JE checkSearchStockOutResult
+		
 		CALL clearStockVariableBuffer
 		CALL readStockDetails
 		CALL compareExactString
@@ -58,10 +60,6 @@ compareAndStockOut PROC
 		JE enterStockOutQty
 		
 		CALL appendToBuffer
-		
-		MOV AL, [SI]
-		CMP AX, 0
-		JE checkSearchStockOutResult
 	
 		JMP searchStockOut
 		

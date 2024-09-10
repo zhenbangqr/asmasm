@@ -55,6 +55,8 @@ INCLUDE Kh\report.inc
 MAIN PROC 
     MOV AX,@DATA
     MOV DS,AX
+	
+	clnScr
 
 mainPageLoop:
 	CALL loginPage
@@ -84,7 +86,7 @@ menuLoop:
     JMP logOut
 
 generateReport:
-    ; Code for Generate Report
+	MOV numStockFound, 0
 	CALL reportMenu
 	
     JMP menuLoop
@@ -100,11 +102,10 @@ stockOut:
 		CALL compareAndStockOut
 		CALL closeFile
 		CALL closeWriteFile
-		;CALL switchStockFileName   ;havent done yet
+		CALL updateStockFileName
 		JMP stockOutProcess
 
 searchStock:
-    ; Code for Search Stock
 	searchStockLoop:
 		MOV numStockFound, 0
 		CALL searchMenu
@@ -134,7 +135,7 @@ stockIn:
 		CALL compareAndStockIn
 		CALL closeFile
 		CALL closeWriteFile
-		;CALL switchStockFileName   ;havent done yet
+		CALL updateStockFileName
 		JMP stockInProcess
 
 exitProgram:

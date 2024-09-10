@@ -9,8 +9,6 @@
 		numberInputed DB 3 DUP("$")
 .CODE
 stockInMenu PROC
-	print_NewLine
-	
 	MOV AH, 09H
 	LEA DX, continueStockInPrompt
 	INT 21H
@@ -46,7 +44,7 @@ stockInMenu PROC
 stockInMenu ENDP
 
 compareAndStockIn PROC
-	CALL openWriteStockFile
+	CALL openWriteTempFile
 	CALL writeStockFileTitle
 	
 	CALL openReadStockFile
@@ -55,6 +53,10 @@ compareAndStockIn PROC
 	CALL searchPhoneStock
 	
 	searchStockIn:
+		MOV AL, [SI]
+		CMP AX, 0
+		JE checkSearchStockInResult
+		
 		CALL clearStockVariableBuffer
 		CALL readStockDetails
 		CALL compareExactString
@@ -62,10 +64,6 @@ compareAndStockIn PROC
 		JE enterStockInQty
 		
 		CALL appendToBuffer
-		
-		MOV AL, [SI]
-		CMP AX, 0
-		JE checkSearchStockInResult
 	
 		JMP searchStockIn
 		
