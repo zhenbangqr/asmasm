@@ -12,6 +12,11 @@
 
 .CODE
 
+
+;--------------------------------------
+;	stockReportDetails
+;	display the header of the report
+;--------------------------------------
 stockReportDetails PROC
 	
 	CMP choice, 3
@@ -43,6 +48,11 @@ stockReportDetails PROC
 	
 stockReportDetails ENDP
 
+;-----------------------------------------------------------------
+;	rptDetails
+;	read the data from file and display the summary of the report
+;	Eg. Total stock and Total stock value
+;-----------------------------------------------------------------
 rptDetails PROC
 	
 	CALL openReadStockFile
@@ -70,7 +80,7 @@ rptDetails PROC
 	
 	reportSummary:
 		MOV numStockFound, 0
-		CALL closeFile
+		CALL closeReadFile
 		
 		CMP choice, 3
 		JE displayInvDivider
@@ -110,6 +120,12 @@ rptDetails PROC
 	
 rptDetails ENDP
 
+
+;-----------------------------------------------
+;	rptStockDetails
+;	display the details of the report
+;	Eg. Phone Name, RAM, ROM, Color, Quantity
+;-----------------------------------------------
 rptStockDetails PROC
 	MOV AX, 0
 	MOV AL, numStockFound
@@ -219,6 +235,11 @@ rptStockDetails PROC
 	
 rptStockDetails ENDP
 
+
+;---------------------------------------------
+;	sumOfStock
+;	calculate the sum of the quantity stock
+;---------------------------------------------
 sumOfStock PROC
 
 	CMP choice, 1
@@ -252,6 +273,10 @@ sumOfStock PROC
 
 sumOfStock ENDP
 
+;------------------------------------------------------
+;	calStockValues
+;	calculate the stock value for each type of phone
+;------------------------------------------------------
 calStockValues PROC
 	
 	MOV AX, WORD PTR Stock.phonePrice
@@ -294,6 +319,10 @@ calStockValues PROC
 	
 calStockValues ENDP
 
+;------------------------------------------------------------
+;	sumOfStockValue
+;	calculate the sum of the stock value for all the phone
+;------------------------------------------------------------
 sumOfStockValue PROC
 	
 	MOV AX, WORD PTR stockValueFP
@@ -326,6 +355,10 @@ sumOfStockValue PROC
 	
 sumOfStockValue ENDP
 
+;----------------------------------------------------
+;	displayFloatingPoint
+;	display the floating point for the stock value
+;----------------------------------------------------
 displayFloatingPoint PROC
 
 	DIV ten8Bits

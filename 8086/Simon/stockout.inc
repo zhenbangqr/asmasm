@@ -62,7 +62,12 @@ compareAndStockOut PROC
 		CALL appendToBuffer
 	
 		JMP searchStockOut
-		
+	
+	endStockOut:
+		pause
+		clnScr
+		RET
+	
 	enterStockOutQty:
 		MOV AH, 09H
 		LEA DX, promptStockOutQty
@@ -91,11 +96,6 @@ compareAndStockOut PROC
 		CALL appendToBuffer
 		
 		JMP searchStockOut
-	
-	endStockOut:
-		pause
-		clnScr
-		RET
 		
 	checkSearchStockOutResult:
 		CMP numStockFound, 0

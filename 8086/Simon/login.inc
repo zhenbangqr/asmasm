@@ -129,33 +129,28 @@ user_Login PROC
 			
 			JMP getPasswordInput
 	
-		pwNotEql:
-			JMP readAndCompare
-	
 		invalidInput:
 			;--Loop back to the getUserIDInput until user entered exact User-ID & Password
 			
-			MOV AH,09H
-			LEA DX,newLine
-			INT 21H
+			print_NewLine
 			
 			;--Display invalid ID message
 			MOV AH,09H
 			LEA DX,loginFailMsg
 			INT 21H
 		
-			;--Nextline
-			MOV AH,09H
-			LEA DX,newLine
-			INT 21H
+			print_NewLine
 			
-			CALL closeFile
+			CALL closeReadFile
 			
 			pause
 			clnScr
 			
 			JMP getUserIDInput
-			
+		
+		pwNotEql:
+			JMP readAndCompare
+		
 		getPasswordInput:
 			;--Prompt for User Password
 			MOV AH,09H
@@ -168,9 +163,7 @@ user_Login PROC
 			INT 21H
 			
 			;--Nextline
-			MOV AH,09H
-			LEA DX,newLine
-			INT 21H	
+			print_NewLine
 		
 		getDefaultPasswordLength:
 			LEA DI,Staff.userID ;LEA DI,Staff.userID

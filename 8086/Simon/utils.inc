@@ -1,6 +1,6 @@
 .DATA
-	divider db "=============================================================================$"
-	
+	divider DB "=============================================================================$"
+	pausePrompt DB "Press any key to continue...$"
 
 ;------------
 ;This file defines multiple MACROS to reduce code repetitions 
@@ -102,6 +102,10 @@ ENDM
 
 ;--Macro to pause the screen
 pause MACRO
+	
+	MOV AH, 09H
+	LEA DX, pausePrompt
+	INT 21H
 	
 	MOV AH,01H
     INT 21H

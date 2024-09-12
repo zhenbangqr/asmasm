@@ -92,7 +92,7 @@ openReadTempFile ENDP
 ;	closeStockFile
 ;	close the stock file(Phone.txt)
 ;------------------------------------------------------
-closeFile PROC
+closeReadFile PROC
 	CALL clearReadFileBuffer
 	
 	mov bx, fileHandle
@@ -101,14 +101,19 @@ closeFile PROC
     jc fileError            ; If carry flag is set, an error occurred
 	
 	RET
-closeFile ENDP
+closeReadFile ENDP
+
+
+fileError:
+	CALL findFileError
+
 
 ;--------------------------------------------------
-;	fileError
+;	findFileError
 ;	Show a message when error happen to the file
 ;	and close the file
-;--------------------------------------------------
-fileError:
+;--------------------------------------------------	
+findFileError PROC
     ; Handle file error
     mov ah, 09h
     lea dx, fileErrorMsg
@@ -116,7 +121,9 @@ fileError:
     jmp exitReadFile
 
 exitReadFile:
-    call closeFile
+    call closeReadFile
+	RET
+findFileError ENDP
 	
 ;-------------------------------------------------------
 ;	readStringFromFile
@@ -141,73 +148,7 @@ readStringFromFile PROC
 		RET
 	
 readStringFromFile ENDP
-	
-;---------------------------------------
-;	readStockPrice
-;	read the price from the file
-;---------------------------------------
-readStockPrice PROC
-	MOV AX, 0
-	MOV BX, 0
-	
-	MOV BL, [SI]
-	SUB BL, 30H
-	
-	MOV AX, BX
-	INC SI
-	
-	continueReadPrice:
-		MOV BL, [SI]
-		CMP BL, '.'
-		JE endReadPrice
-	
-		MUL ten16Bits
-		SUB BL, 30H
-		ADD AX, BX
-	
-		INC SI
-	
-		JMP continueReadPrice
-		
-	endReadPrice:
-		MOV WORD PTR Stock.phonePrice, AX
-		MOV WORD PTR Stock.phonePrice + 2, DX
 
-		INC SI
-	
-		JMP readPriceFP
-
-	readPriceFP:
-		MOV AX, 0
-		MOV BX, 0
-		
-		MOV BL, [SI]
-		SUB BL, 30H
-		
-		MOV AX, BX
-		INC SI
-		
-	continueReadPriceFP:
-		MOV BL, [SI]
-		CMP BL, ';'
-		JE endReadPriceFP
-		
-		MUL ten16Bits
-		SUB BL, 30H
-		ADD AX, BX
-		
-		INC SI
-		
-		JMP continueReadPriceFP
-		
-	endReadPriceFP:
-		MOV WORD PTR Stock.phonePriceFP, AX
-		MOV WORD PTR Stock.phonePriceFP + 2, DX
-	
-		INC SI
-		RET
-		
-readStockPrice ENDP
 
 ;----------------------------------------
 ;	readNumber
@@ -229,7 +170,9 @@ readNumber PROC
 		MOV BL, [SI]
 		CMP BL, ';'
 		JE endReadNumber
-		
+		CMP BL, '.'
+		JE endReadNumber
+
 		MUL ten16Bits
 		SUB BL, 30H
 		ADD AX, BX
@@ -262,7 +205,13 @@ readStockDetails PROC
 	LEA DI, Stock.phoneColor
 	CALL readStringFromFile
 	
-	CALL readStockPrice
+	CALL readNumber
+	MOV WORD PTR Stock.phonePrice, AX
+	MOV WORD PTR Stock.phonePrice + 2, DX
+	
+	CALL readNumber
+	MOV WORD PTR Stock.phonePriceFP, AX
+	MOV WORD PTR Stock.phonePriceFP + 2, DX
 	
 	CALL readNumber
 	MOV WORD PTR Stock.phoneQty, AX
@@ -435,10 +384,14 @@ stringToNumber PROC
 stringToNumber ENDP
 
 
-
+;-------------------------------------
+;	clearReadBuffer
+;	clear the buffer
+;-------------------------------------
 clearReadBuffer PROC
 	MOV CX, 20
     MOV AL, 0             ; Value to fill the buffer (zero in this case)
+	
 clearBufferLoop:
     MOV [DI], AL          ; Store value AL at address DI
     INC DI     	          ; Move to the next byte
@@ -449,7 +402,10 @@ clearBufferLoop:
 clearReadBuffer ENDP
 
 
-
+;--------------------------------------------
+;	clearStockVariableBuffer
+;	clear the buffer for all stock variable
+;--------------------------------------------
 clearStockVariableBuffer PROC
 
 	LEA DI, Stock.phoneName
@@ -483,6 +439,11 @@ clearStockVariableBuffer PROC
 	RET
 clearStockVariableBuffer ENDP
 
+
+;----------------------------------------------------
+;	clearReadFileBuffer
+;	clear the read buffer
+;----------------------------------------------------
 clearReadFileBuffer PROC
 	;clear the Buffer
 		MOV CX, 1024  ; Buffer size

@@ -100,7 +100,7 @@ stockOut:
 		JE menuLoop
 		
 		CALL compareAndStockOut
-		CALL closeFile
+		CALL closeReadFile
 		CALL closeWriteFile
 		CALL updateStockFileName
 		JMP stockOutProcess
@@ -114,7 +114,7 @@ searchStock:
 		JE menuLoop
 		
 		CALL inputAndSearch
-		CALL closeFile
+		CALL closeReadFile
 		JMP searchStockLoop
 
 logOut:
@@ -133,7 +133,7 @@ stockIn:
 		JE menuLoop
 		
 		CALL compareAndStockIn
-		CALL closeFile
+		CALL closeReadFile
 		CALL closeWriteFile
 		CALL updateStockFileName
 		JMP stockInProcess

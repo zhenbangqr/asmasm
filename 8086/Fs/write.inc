@@ -276,7 +276,7 @@ updateStockFileName PROC
 		
 	endWriteBackToOrigin:
 		CALL closeWriteFile
-		CALL closeFile
+		CALL closeReadFile
 		MOV AH, 41h        	  ; DOS function to delete a file
 		LEA DX, tempFileName ; Address of file to delete (Phone.txt)
 		INT 21H            	  ; Call DOS

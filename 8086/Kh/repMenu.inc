@@ -9,7 +9,10 @@
 	invStatTitle DB "==                        Inventory Status Report                         ==", 0DH, 0AH, "$"
 	
 .CODE
-
+;------------------------------------------------------
+;	reportMenu
+;	calculate the stock value for each type of phone
+;------------------------------------------------------
 reportMenu PROC
 	
 	rptList:
@@ -59,32 +62,29 @@ reportMenu PROC
 		
 	rptCmpChoice:
 		CMP choice, 1
-		JE stockInReport
+		JE stockInHeader
 		CMP choice, 2
-		JE stockOutReport
+		JE stockOutHeader
 		CMP choice, 3
 		JE invStatReport
 		
 		clnScr
 		JMP rptMenuEnd
 	
-	stockInReport:
+	stockInHeader:
 		rptDivider
 		MOV AH, 09H
 		LEA DX, stockInTitle
 		INT 21H
-		rptDivider
-		CALL stockReportDetails
-		rptDivider
-		pause
-
-		JMP rptList
-
-	stockOutReport:
+		JMP stockInOutReport
+	
+	stockOutHeader:
 		rptDivider
 		MOV AH, 09H
 		LEA DX, stockOutTitle
 		INT 21H
+		
+	stockInOutReport:
 		rptDivider
 		CALL stockReportDetails
 		rptDivider
