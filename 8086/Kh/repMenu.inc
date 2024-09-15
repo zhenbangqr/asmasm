@@ -1,12 +1,13 @@
 .DATA
 	reportTitle DB "==                          Report                           ==", 0DH, 0AH, "$"
-	reportChoice DB "1. Monthly Stock In Report", 0DH, 0AH, "2. Monthly Stock Out Report", 0DH, 0AH, "3. Inventory Status Report", 0DH, 0AH, "4. Return", 0DH, 0AH, "$"
-	promptReportChoice DB "Enter a digit(1-4): $"
+	reportChoice DB "1. Monthly Stock In Report", 0DH, 0AH, "2. Monthly Stock Out Report", 0DH, 0AH, "3. Inventory Status Report", 0DH, 0AH, "4. Low Stock Report", 0DH, 0AH, "5. Return", 0DH, 0AH, "$"
+	promptReportChoice DB "Enter a digit(1-5): $"
 	reportDivider DB "===============================================================", 0DH, 0AH, "$"
 	invStatusDivider DB "============================================================================", 0DH, 0AH, "$"
 	stockInTitle DB "==                  Monthly Stock In Report                  ==", 0DH, 0AH, "$"
 	stockOutTitle DB "==                  Monthly Stock Out Report                 ==", 0DH, 0AH, "$"
 	invStatTitle DB "==                        Inventory Status Report                         ==", 0DH, 0AH, "$"
+	lowStockTitle DB "==                     Low Stock Report                      ==", 0DH, 0AH, "$"
 	
 .CODE
 ;------------------------------------------------------
@@ -39,7 +40,7 @@ reportMenu PROC
 		
 		CMP AL, 1
 		JB rptInvalidChoice
-		CMP AL, 4
+		CMP AL, 5
 		JA rptInvalidChoice
 		
 		print_Newline
@@ -67,6 +68,8 @@ reportMenu PROC
 		JE stockOutHeader
 		CMP choice, 3
 		JE invStatReport
+		CMP choice, 4
+		JE lowStockHeader
 		
 		clnScr
 		JMP rptMenuEnd
@@ -76,15 +79,22 @@ reportMenu PROC
 		MOV AH, 09H
 		LEA DX, stockInTitle
 		INT 21H
-		JMP stockInOutReport
+		JMP stockInOutLowReport
 	
 	stockOutHeader:
 		rptDivider
 		MOV AH, 09H
 		LEA DX, stockOutTitle
 		INT 21H
+		JMP stockInOutLowReport
 		
-	stockInOutReport:
+	lowStockHeader:
+		rptDivider
+		MOV AH, 09H
+		LEA DX, lowStockTitle
+		INT 21H
+		
+	stockInOutLowReport:
 		rptDivider
 		CALL stockReportDetails
 		rptDivider
