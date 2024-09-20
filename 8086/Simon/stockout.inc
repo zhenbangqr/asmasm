@@ -6,6 +6,11 @@
 	stockOutSuccessMsg DB "Stock out sucessfull$"
 	notEnoughStock DB "Stock No Enough!$"
 .CODE
+
+;-----------------------------------------------
+;	stockOutMenu
+;	menu for stock out
+;-----------------------------------------------
 stockOutMenu PROC
 	MOV AH, 09H
 	LEA DX, stockOutMenuTitle
