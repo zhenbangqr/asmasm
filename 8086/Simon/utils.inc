@@ -83,10 +83,10 @@ rptDivider MACRO
 	
 ENDM
 
-invDivider MACRO
+csppDivider MACRO
 
 	MOV AH,09H
-	LEA DX,invStatusDivider
+	LEA DX, currStockPhoneProfitDivider
 	INT 21H
 	
 ENDM

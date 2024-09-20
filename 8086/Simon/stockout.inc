@@ -1,10 +1,16 @@
 .DATA
+	stockOutMenuTitle DB "========================================", 0dh, 0ah, "==           Stock Out Menu           ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	enterStockOutQtyTitle DB "========================================", 0dh, 0ah, "==      Enter Stock Out Quantity      ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
 	continueStockOutPrompt DB "1. Search stock for stock out", 0DH, 0AH, "2. Exit Search", 0DH, 0AH, "Please Enter Your Choice : $"
 	promptStockOutQty DB "Enter Stock Out Quantity: $"
 	stockOutSuccessMsg DB "Stock out sucessfull$"
 	notEnoughStock DB "Stock No Enough!$"
 .CODE
 stockOutMenu PROC
+	MOV AH, 09H
+	LEA DX, stockOutMenuTitle
+	INT 21H
+	
 	MOV AH, 09H
 	LEA DX, continueStockOutPrompt
 	INT 21H
@@ -40,6 +46,10 @@ stockOutMenu PROC
 stockOutMenu ENDP
 
 compareAndStockOut PROC
+	MOV AH, 09H
+	LEA DX, searchTitle
+	INT 21H
+		
 	CALL openWriteTempFile
 	CALL writeStockFileTitle
 	
@@ -67,8 +77,28 @@ compareAndStockOut PROC
 		pause
 		clnScr
 		RET
+		
+	noStockOutMsg:
+		MOV AH, 09H
+		LEA DX, searchFailMsg
+		INT 21H
+		
+		print_NewLine
+		
+		JMP endStockOut
+	
+	checkSearchStockOutResult:
+		CMP numStockFound, 0
+		JE noStockOutMsg
+		print_NewLine
+		JMP endStockOut
 	
 	enterStockOutQty:
+		clnScr
+		MOV AH, 09H
+		LEA DX, enterStockOutQtyTitle
+		INT 21H
+		
 		MOV AH, 09H
 		LEA DX, promptStockOutQty
 		INT 21H
@@ -97,11 +127,6 @@ compareAndStockOut PROC
 		
 		JMP searchStockOut
 		
-	checkSearchStockOutResult:
-		CMP numStockFound, 0
-		JE noStockOutMsg
-		print_NewLine
-		JMP endStockOut
 	
 	InvalidStockOutQtyInput:
 		MOV AH, 09H
@@ -126,14 +151,5 @@ compareAndStockOut PROC
 		clnScr
 		
 		JMP enterStockOutQty
-	
-	noStockOutMsg:
-		MOV AH, 09H
-		LEA DX, searchFailMsg
-		INT 21H
-		
-		print_NewLine
-		
-		JMP endStockOut
 
 compareAndStockOut ENDP

@@ -1,13 +1,14 @@
 .DATA
-	reportTitle DB "==                          Report                           ==", 0DH, 0AH, "$"
-	reportChoice DB "1. Monthly Stock In Report", 0DH, 0AH, "2. Monthly Stock Out Report", 0DH, 0AH, "3. Inventory Status Report", 0DH, 0AH, "4. Low Stock Report", 0DH, 0AH, "5. Return", 0DH, 0AH, "$"
-	promptReportChoice DB "Enter a digit(1-5): $"
-	reportDivider DB "===============================================================", 0DH, 0AH, "$"
-	invStatusDivider DB "============================================================================", 0DH, 0AH, "$"
-	stockInTitle DB "==                  Monthly Stock In Report                  ==", 0DH, 0AH, "$"
-	stockOutTitle DB "==                  Monthly Stock Out Report                 ==", 0DH, 0AH, "$"
-	invStatTitle DB "==                        Inventory Status Report                         ==", 0DH, 0AH, "$"
-	lowStockTitle DB "==                     Low Stock Report                      ==", 0DH, 0AH, "$"
+	reportTitle DB      "==                          Report                           ==", 0DH, 0AH, "$"
+	reportChoice DB     "1. Current Inventory Stock", 0DH, 0AH, "2. Stock In Report", 0DH, 0AH, "3. Stock Out Report", 0DH, 0AH, "4. Low Stock Report", 0DH, 0AH, "5. Phone Profit Report", 0DH, 0AH, "6. Return", 0DH, 0AH, "$"
+	promptReportChoice DB "Enter a digit(1-6): $"
+	currStockPhoneProfitDivider DB "============================================================================", 0DH, 0AH, "$"
+	currStockTitle DB              "==                        Current Inventory Stock                         ==", 0DH, 0AH, "$"
+	phoneProfitTitle DB            "==                          Phone Profit Report                           ==", 0DH, 0AH, "$"
+	reportDivider DB    "===============================================================", 0DH, 0AH, "$"
+	stockInTitle DB     "==                      Stock In Report                      ==", 0DH, 0AH, "$"
+	stockOutTitle DB    "==                     Stock Out Report                      ==", 0DH, 0AH, "$"
+	lowStockTitle DB    "==                     Low Stock Report                      ==", 0DH, 0AH, "$"
 	
 .CODE
 ;------------------------------------------------------
@@ -40,7 +41,7 @@ reportMenu PROC
 		
 		CMP AL, 1
 		JB rptInvalidChoice
-		CMP AL, 5
+		CMP AL, 6
 		JA rptInvalidChoice
 		
 		print_Newline
@@ -63,30 +64,48 @@ reportMenu PROC
 		
 	rptCmpChoice:
 		CMP choice, 1
-		JE stockInHeader
+		JE currStockReport
 		CMP choice, 2
-		JE stockOutHeader
+		JE stockInHeader
 		CMP choice, 3
-		JE invStatReport
+		JE stockOutHeader
 		CMP choice, 4
 		JE lowStockHeader
+		CMP choice, 5
+		JE phoneProfitHeader
 		
 		clnScr
-		JMP rptMenuEnd
+		RET
+		
+	currStockReport:
+		csppDivider
+		MOV AH, 09H
+		LEA DX, currStockTitle
+		INT 21H
+		
+		JMP currStockPhoneProfitReport
+		
+	phoneProfitHeader:
+		csppDivider
+		MOV AH, 09H
+		LEA DX, phoneProfitTitle
+		INT 21H
+		
+		JMP currStockPhoneProfitReport
 	
 	stockInHeader:
 		rptDivider
 		MOV AH, 09H
 		LEA DX, stockInTitle
 		INT 21H
-		JMP stockInOutLowReport
+		JMP stockInOutLowProfitReport
 	
 	stockOutHeader:
 		rptDivider
 		MOV AH, 09H
 		LEA DX, stockOutTitle
 		INT 21H
-		JMP stockInOutLowReport
+		JMP stockInOutLowProfitReport
 		
 	lowStockHeader:
 		rptDivider
@@ -94,27 +113,23 @@ reportMenu PROC
 		LEA DX, lowStockTitle
 		INT 21H
 		
-	stockInOutLowReport:
-		rptDivider
-		CALL stockReportDetails
-		rptDivider
-		pause
+		JMP stockInOutLowProfitReport
 	
-		JMP rptList
-	
-	invStatReport:
-		invDivider
-		MOV AH, 09H
-		LEA DX, invStatTitle
-		INT 21H
-		invDivider
+	currStockPhoneProfitReport:
+		csppDivider
 		CALL stockReportDetails
-		invDivider
-		pause
+		csppDivider
 		
-		JMP rptList
+		JMP rptMenuEnd
+		
+	stockInOutLowProfitReport:
+		rptDivider
+		CALL stockReportDetails
+		rptDivider
+		
 	
 	rptMenuEnd:
-		RET
+		pause
+		JMP rptList
 	
 reportMenu ENDP

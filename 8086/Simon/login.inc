@@ -1,9 +1,10 @@
 .DATA 
 	loginTitle DB "========================================", 0dh, 0ah, "==                Login               ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	logoutTitle DB "========================================", 0dh, 0ah, "==                Logout              ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
 	promptLoginID DB "Enter user-ID :$"
 	promptPassword DB "Password :$"
 	
-	welcomeTitle DB "=================================================", 0dh, 0ah, "==    Welcome to FS Phone Inventiory System    ==", 0dh, 0ah, "=================================================", 0dh,0ah, "$"
+	welcomeTitle DB "=================================================", 0dh, 0ah, "==     Welcome to FS Phone Inventory System    ==", 0dh, 0ah, "=================================================", 0dh,0ah, "$"
 	loginComfirmation DB "Do you want to Log In?", 0DH, 0AH, "1. Login", 0DH, 0AH, "2. Exit", 0DH, 0AH, "Enter your choice(1 or 2): $"
 	logOutComfirmation DB "Do you confirm want to Log Out?", 0DH, 0AH, "1. Yes", 0DH, 0AH, "2. No", 0DH, 0AH, "Enter your choice(1 or 2): $"
 	
@@ -220,6 +221,10 @@ user_Login ENDP
 logOutComfirm PROC
 
 	logOutComfirmationLoop:
+		MOV AH, 09H
+		LEA DX, logoutTitle
+		INT 21H
+		
 		MOV AH, 09H
 		LEA DX, logOutComfirmation
 		INT 21H

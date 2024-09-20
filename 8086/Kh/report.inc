@@ -1,14 +1,22 @@
 .DATA
+	currStockDetails DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity  |Stock Values", 0DH, 0AH, "$"
+	phoneProfitDetails DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity  |Profit", 0DH, 0AH, "$"
+	currStockPhoneProfitDetailsDivider DB "===|===============|==========|==========|==========|==========|============", 0DH, 0AH, "$"
 	stockRptDetails DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity", 0DH, 0AH, "$"
 	stockRptDetailsDivider DB "===|===============|==========|==========|==========|==========", 0DH, 0AH, "$"
-	invStatDetails DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity  |Stock Values", 0DH, 0AH, "$"
-	invStatDetailsDivider DB "===|===============|==========|==========|==========|==========|============", 0DH, 0AH, "$"
 	stockRptTotal DB "                                               Total|$"
 	totalStock DD 0
 	stockValue DD 0
 	stockValueFP DD 0
-	tempStockValue DD 0
-	tempStockValueFP DD 0
+	totalStockValue DD 0
+	totalStockValueFP DD 0
+	profit DD ?
+	profitFP DD ?
+	totalProfit DD 0
+	totalProfitFP DD 0
+	sumOfTotalProfit DD 0
+	sumOfTotalProfitFP DD 0
+	profitRate DW 6
 
 .CODE
 
@@ -18,8 +26,10 @@
 ;--------------------------------------
 stockReportDetails PROC
 	
-	CMP choice, 3
-	JE displayInvStat
+	CMP choice, 1
+	JE displayCurrStock
+	CMP choice, 5
+	JE displayPhoneProfit
 		
 	MOV AH, 09H
 	LEA DX, stockRptDetails
@@ -31,13 +41,21 @@ stockReportDetails PROC
 	
 	JMP detailsNext
 	
-	displayInvStat:
+	displayCurrStock:
 		MOV AH, 09H
-		LEA DX, invStatDetails
+		LEA DX, currStockDetails
+		INT 21H
+		
+		JMP displayDetailsDivider
+		
+	displayPhoneProfit:
+		MOV AH, 09H
+		LEA DX, phoneProfitDetails
 		INT 21H
 	
+	displayDetailsDivider:
 		MOV AH, 09H
-		LEA DX, invStatDetailsDivider
+		LEA DX, currStockPhoneProfitDetailsDivider
 		INT 21H
 	
 	detailsNext:
@@ -94,17 +112,19 @@ rptDetails PROC
 		MOV numStockFound, 0
 		CALL closeReadFile
 		
+		CMP choice, 1
+		JE displayCSPPDivider
+		CMP choice, 5
+		JE displayCSPPDivider
 		CMP choice, 4
 		JE reportEnd
-		CMP choice, 3
-		JE displayInvDivider
 		
 		rptDivider
 		
 		JMP displayTotalStock
 		
-		displayInvDivider:
-			invDivider
+		displayCSPPDivider:
+			csppDivider
 		
 		displayTotalStock:
 			MOV AH, 09H
@@ -120,19 +140,25 @@ rptDetails PROC
 			MOV WORD PTR totalStock, 0
 			MOV WORD PTR totalStock + 2, 0
 		
-		CMP choice, 3
-		JE displaySumOfStockValue
-		
-		print_Newline
+		CMP choice, 1
+		JE displaySumStockValue
+		CMP choice, 5
+		JE displaySumTotalProfit
 		
 		JMP reportEnd
 		
-		displaySumOfStockValue:
+		displaySumStockValue:
 			delimiter
-			CALL sumOfStockValue
-			print_Newline
+			CALL displaySumOfStockValue
+			
+			JMP reportEnd
+			
+		displaySumTotalProfit:
+			delimiter
+			CALL displaySumOfTotalProfit
 		
 		reportEnd:
+			print_Newline
 			RET
 	
 rptDetails ENDP
@@ -213,12 +239,14 @@ rptStockDetails PROC
 	delimiter
 	
 	CMP choice, 1
-	JE qtyIn
-	CMP choice, 2
-	JE qtyOut
-	CMP choice, 3
 	JE qtyInv
+	CMP choice, 2
+	JE qtyIn
+	CMP choice, 3
+	JE qtyOut
 	CMP choice, 4
+	JE qtyInv
+	CMP choice, 5
 	JE qtyInv
 	
 	qtyIn:
@@ -244,12 +272,22 @@ rptStockDetails PROC
 		CALL displayNumber
 		CALL fillSpace
 		
-		CMP choice, 4
-		JE reportDetailsEnd
+		CMP choice, 1
+		JE calculateStockValue
+		CMP choice, 5
+		JE calculatePhoneProfit
+
+		JMP reportDetailsEnd
 		
-		delimiter
+		calculateStockValue:
+			delimiter
+			CALL calStockValue
+			
+			JMP reportDetailsEnd
 		
-		CALL calStockValues
+		calculatePhoneProfit:
+			delimiter
+			CALL calProfit
 	
 	reportDetailsEnd:
 		RET
@@ -263,11 +301,13 @@ rptStockDetails ENDP
 sumOfStock PROC
 
 	CMP choice, 1
-	JE calQtyStockIn
+	JE calQtyInvStock
 	CMP choice, 2
-	JE calQtyStockOut
+	JE calQtyStockIn
 	CMP choice, 3
-	JE calQtyInvStat
+	JE calQtyStockOut
+	CMP choice, 5
+	JE calQtyInvStock
 	
 	calQtyStockIn:
 		MOV AX, WORD PTR Stock.totalStockInQty
@@ -281,7 +321,7 @@ sumOfStock PROC
 	
 	JMP finalCal
 	
-	calQtyInvStat:
+	calQtyInvStock:
 		MOV AX, WORD PTR Stock.phoneQty
 		MOV DX, WORD PTR Stock.phoneQty + 2
 	
@@ -294,21 +334,17 @@ sumOfStock PROC
 sumOfStock ENDP
 
 ;------------------------------------------------------
-;	calStockValues
+;	calStockValue
 ;	calculate the stock value for each type of phone
 ;------------------------------------------------------
-calStockValues PROC
-	
+calStockValue PROC
 	MOV AX, WORD PTR Stock.phonePrice
 	MOV DX, WORD PTR Stock.phonePrice + 2
 	
 	MUL WORD PTR Stock.phoneQty
 	
-	ADD WORD PTR stockValue, AX
-	ADD WORD PTR stockValue + 2, DX
-	
-	MOV WORD PTR tempStockValue, AX
-	MOV WORD PTR tempStockValue + 2, DX
+	MOV WORD PTR stockValue, AX
+	MOV WORD PTR stockValue + 2, DX
 	
 	MOV AX, WORD PTR Stock.phonePriceFP
 	MOV DX, WORD PTR Stock.phonePriceFP + 2
@@ -317,52 +353,61 @@ calStockValues PROC
 	DIV hundred16bits
 	
 	ADD WORD PTR stockValue, AX
-	ADD WORD PTR tempStockValue, AX
-	MOV WORD PTR tempStockValueFP, DX
+	MOV WORD PTR stockValueFP, DX
 	
-	ADD WORD PTR stockValueFP, DX
+	displayStockValue:
+		MOV AX, WORD PTR stockValue
+		MOV DX, WORD PTR stockValue + 2
+		CALL displayNumber
+		
+		MOV AH, 02H
+		MOV DL, '.'
+		INT 21H
+		
+		MOV AX, WORD PTR stockValueFP
+		MOV DX, WORD PTR stockValueFP + 2
+		CALL displayFloatingPoint
 	
-	
-	MOV AX, WORD PTR tempStockValue
-	MOV DX, WORD PTR tempStockValue + 2
-	CALL displayNumber
-	
-	MOV AH, 02H
-	MOV DL, '.'
-	INT 21H
-	
-	MOV AX, WORD PTR tempStockValueFP
-	MOV DX, WORD PTR tempStockValueFP + 2
-	CALL displayFloatingPoint
-	
+	sumTotalStockValue:
+		MOV AX, WORD PTR stockValue
+		MOV DX, WORD PTR stockValue + 2
+		
+		ADD WORD PTR totalStockValue, AX
+		ADD WORD PTR totalStockValue + 2, DX
+		
+		MOV AX, WORD PTR stockValueFP
+		MOV DX, WORD PTR stockValueFP + 2
+		
+		ADD WORD PTR totalStockValueFP, AX
+		ADD WORD PTR totalStockValueFP + 2, DX
 	RET
 	
-calStockValues ENDP
+calStockValue ENDP
 
 ;------------------------------------------------------------
 ;	sumOfStockValue
 ;	calculate the sum of the stock value for all the phone
 ;------------------------------------------------------------
-sumOfStockValue PROC
-	
-	MOV AX, WORD PTR stockValueFP
-	MOV DX, WORD PTR stockValueFP + 2
+displaySumOfStockValue PROC
+	;round the floating point and add to profit
+	MOV AX, WORD PTR totalStockValueFP
+	MOV DX, WORD PTR totalStockValueFP + 2
 	
 	DIV hundred16bits
 	
-	ADD WORD PTR stockValue, AX
-	MOV WORD PTR stockValueFP, DX
-	
-	MOV AX, WORD PTR stockValue
-	MOV DX, WORD PTR stockValue + 2
+	ADD WORD PTR totalStockValue, AX
+	MOV WORD PTR totalStockValueFP, DX
+
+	MOV AX, WORD PTR totalStockValue
+	MOV DX, WORD PTR totalStockValue + 2
 	CALL displayNumber
 	
 	MOV AH, 02H
 	MOV DL, '.'
 	INT 21H
 	
-	MOV AX, WORD PTR stockValueFP
-	MOV DX, WORD PTR stockValueFP + 2
+	MOV AX, WORD PTR totalStockValueFP
+	MOV DX, WORD PTR totalStockValueFP + 2
 	CALL displayFloatingPoint
 	
 	MOV WORD PTR stockValue, 0
@@ -373,7 +418,140 @@ sumOfStockValue PROC
 	
 	RET
 	
-sumOfStockValue ENDP
+displaySumOfStockValue ENDP
+
+calProfit PROC
+	MOV WORD PTR profit, 0
+	MOV WORD PTR profit + 2, 0
+	MOV WORD PTR profitFP, 0
+	MOV WORD PTR profitFP + 2, 0
+	MOV WORD PTR totalProfit, 0
+	MOV WORD PTR totalProfit + 2, 0
+	MOV WORD PTR totalProfitFP, 0
+	MOV WORD PTR totalProfitFP + 2, 0
+	
+	;calculateProfitForOnePhone
+	MOV AX, WORD PTR Stock.phonePrice
+	MOV DX, WORD PTR Stock.phonePrice + 2
+	
+	MUL profitRate
+	DIV hundred16bits
+	
+	MOV WORD PTR profit, AX
+	
+	;DX should be store the floating point value
+	;MOV DX to AX to multiply with phone quantity first
+	MOV AX, DX
+	MUL WORD PTR Stock.phoneQty
+	
+	;store to profitFP
+	MOV WORD PTR profitFP, AX
+
+	;calculate the profit floating point for phonePriceFP
+	MOV AX, WORD PTR Stock.phonePriceFP
+	MOV DX, WORD PTR Stock.phonePriceFP + 2
+	
+	MUL profitRate
+	MUL WORD PTR Stock.phoneQty
+	DIV hundred16bits
+	
+	;cmp to round the floating point to 2 decimal places
+	CMP DX, 10
+	JL compareWith5
+		
+	CMP DX, 50
+	JL addProfitFP
+		
+	compareWith5:
+		CMP DX, 5
+		JL addProfitFP
+		INC AX
+	
+	addProfitFP:
+		ADD WORD PTR profitFP, AX
+	
+	;multiply the profit get above to get the total profit
+	MOV AX, WORD PTR profit
+	MOV DX, WORD PTR profit + 2
+	
+	MUL WORD PTR Stock.phoneQty
+	
+	MOV WORD PTR totalProfit, AX
+	MOV WORD PTR totalProfit + 2, DX
+	
+	;divide the profit floating point with 100 to seperate it into RM and Sen.
+	;For example, 110 will become RM1 and 10sen
+	MOV AX, WORD PTR profitFP
+	MOV DX, WORD PTR profitFP + 2
+		
+	DIV hundred16bits
+	
+	MOV WORD PTR totalProfitFP, DX
+	ADD WORD PTR totalProfit, AX
+	
+	displayTotalProfit:
+		MOV AX, WORD PTR totalProfit
+		MOV DX, WORD PTR totalProfit + 2
+		CALL displayNumber
+		
+		MOV AH, 02H
+		MOV DL, '.'
+		INT 21H
+		
+		MOV AX, WORD PTR totalProfitFP
+		MOV DX, WORD PTR totalProfitFP + 2
+		CALL displayFloatingPoint
+	
+	sumTotalProfit:
+		MOV AX, WORD PTR totalProfit
+		MOV DX, WORD PTR totalProfit + 2
+		
+		ADD WORD PTR sumOfTotalProfit, AX
+		ADD WORD PTR sumOfTotalProfit + 2, DX
+		
+		MOV AX, WORD PTR totalProfitFP
+		MOV DX, WORD PTR totalProfitFP + 2
+		
+		ADD WORD PTR sumOfTotalProfitFP, AX
+		ADD WORD PTR sumOfTotalProfitFP + 2, DX
+	
+	RET
+	
+calProfit ENDP
+
+displaySumOfTotalProfit PROC	
+	;round the floating point and add to profit
+	MOV AX, WORD PTR sumOfTotalProfitFP
+	MOV DX, WORD PTR sumOfTotalProfitFP + 2
+	
+	DIV hundred16bits
+	
+	ADD WORD PTR sumOfTotalProfit, AX
+	MOV WORD PTR sumOfTotalProfitFP, DX
+
+	;display
+	MOV AX, WORD PTR sumOfTotalProfit
+	MOV DX, WORD PTR sumOfTotalProfit + 2
+
+	CALL displayNumber
+	
+	MOV AH, 02H
+	MOV DL, '.'
+	INT 21H
+	
+	MOV AX, WORD PTR sumOfTotalProfitFP
+	MOV DX, WORD PTR sumOfTotalProfitFP + 2
+	CALL displayFloatingPoint
+	
+	MOV WORD PTR sumOfTotalProfitFP, 0
+	MOV WORD PTR sumOfTotalProfitFP + 2, 0
+	
+	MOV WORD PTR sumOfTotalProfitFP, 0
+	MOV WORD PTR sumOfTotalProfitFP + 2, 0
+	
+	RET
+	
+displaySumOfTotalProfit ENDP
 
 ;----------------------------------------------------
 ;	displayFloatingPoint

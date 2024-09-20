@@ -1,4 +1,6 @@
 .DATA
+	stockInMenuTitle DB "========================================", 0dh, 0ah, "==            Stock In Menu           ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	enterStockInQtyTitle DB "========================================", 0dh, 0ah, "==       Enter Stock In Quantity      ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
 	continueStockInPrompt DB "1. Search stock for stock in", 0DH, 0AH, "2. Exit Search", 0DH, 0AH, "Please Enter Your Choice : $"
 	promptStockInQty DB "Enter Stock In Quantity: $"
 	stockInSuccessMsg DB "Stock in sucessfull$"
@@ -9,6 +11,10 @@
 		numberInputed DB 3 DUP("$")
 .CODE
 stockInMenu PROC
+	MOV AH, 09H
+	LEA DX, stockInMenuTitle
+	INT 21H
+	
 	MOV AH, 09H
 	LEA DX, continueStockInPrompt
 	INT 21H
@@ -44,6 +50,10 @@ stockInMenu PROC
 stockInMenu ENDP
 
 compareAndStockIn PROC
+	MOV AH, 09H
+	LEA DX, searchTitle
+	INT 21H
+		
 	CALL openWriteTempFile
 	CALL writeStockFileTitle
 	
@@ -66,8 +76,33 @@ compareAndStockIn PROC
 		CALL appendToBuffer
 	
 		JMP searchStockIn
+
+	endStockIn:
+		pause
+		clnScr
+		RET	
+		
+	noStockInMsg:
+		MOV AH, 09H
+		LEA DX, searchFailMsg
+		INT 21H
+		
+		print_NewLine
+		
+		JMP endStockIn
+	
+	checkSearchStockInResult:
+		CMP numStockFound, 0
+		JE noStockInMsg
+		print_NewLine
+		JMP endStockIn
 		
 	enterStockInQty:
+		clnScr
+		MOV AH, 09H
+		LEA DX, enterStockInQtyTitle
+		INT 21H
+		
 		MOV AH, 09H
 		LEA DX, promptStockInQty
 		INT 21H
@@ -93,17 +128,6 @@ compareAndStockIn PROC
 		
 		JMP searchStockIn
 	
-	endStockIn:
-		pause
-		clnScr
-		RET
-		
-	checkSearchStockInResult:
-		CMP numStockFound, 0
-		JE noStockInMsg
-		print_NewLine
-		JMP endStockIn
-	
 	invalidStockInQtyInput:
 		MOV AH, 09H
 		LEA DX, invalidInputMsg
@@ -117,14 +141,5 @@ compareAndStockIn PROC
 		clnScr
 
 		JMP enterStockInQty
-	
-	noStockInMsg:
-		MOV AH, 09H
-		LEA DX, searchFailMsg
-		INT 21H
-		
-		print_NewLine
-		
-		JMP endStockIn
 
 compareAndStockIn ENDP

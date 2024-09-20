@@ -1,4 +1,6 @@
 .DATA
+	searchMenuTitle DB "========================================", 0dh, 0ah, "==             Search Menu            ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	searchTitle DB "========================================", 0dh, 0ah, "==             Search Phone           ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
 	searchPrompt DB "Please enter phone name: $"
 	searchSucMsg DB "Here is your search results. Please select your next step. $"
 	searchFailMsg DB "No result found. Please select your next step. $"
@@ -17,8 +19,11 @@
 ;	Ask user whether want to continue search the phone or not
 ;--------------------------------------------------------------
 searchMenu PROC
-
 nextStepChoiceLoop:
+	MOV AH, 09H
+	LEA DX, searchMenuTitle
+	INT 21H
+	
 	MOV AH, 09H
 	LEA DX, nextStepPrompt
 	INT 21H
@@ -63,6 +68,10 @@ searchMenu ENDP
 ;	input a phone name and search the phone
 ;----------------------------------------------
 inputAndSearch PROC
+	MOV AH, 09H
+	LEA DX, searchTitle
+	INT 21H
+	
 	CALL openReadStockFile
 	CALL jumpToNextLine			;Skip the file title
 
@@ -87,6 +96,7 @@ inputAndSearch PROC
 		
 		CMP numStockFound, 1
 		JNE skipDisplaySearchTitle
+		clnScr
 		CALL displaySearchTitle
 
 	skipDisplaySearchTitle:
