@@ -12,7 +12,6 @@
 
 .CODE
 
-
 ;--------------------------------------
 ;	stockReportDetails
 ;	display the header of the report
@@ -43,16 +42,16 @@ stockReportDetails PROC
 	
 	detailsNext:
 		CALL rptDetails
-		print_Newline
+		
 	RET
 	
 stockReportDetails ENDP
 
-;-----------------------------------------------------------------
+;-------------------------------------------------------------------
 ;	rptDetails
 ;	read the data from file and display the summary of the report
 ;	Eg. Total stock and Total stock value
-;-----------------------------------------------------------------
+;-------------------------------------------------------------------
 rptDetails PROC
 	
 	CALL openReadStockFile
@@ -61,8 +60,15 @@ rptDetails PROC
 	rptReadStock:
 		CALL clearStockVariableBuffer
 		CALL readStockDetails
-		INC numStockFound
+		
+		CMP choice, 4
+		JE cmpLowStock
+		
+		incNumStock:
+			INC numStockFound
+		
 		CALL sumOfStock
+		
 		JMP displayReportDetails
 	
 	checkEOF:
@@ -71,6 +77,12 @@ rptDetails PROC
 		JE reportSummary
 		
 		JMP rptReadStock
+		
+	cmpLowStock:
+		CMP WORD PTR Stock.phoneQty, 10
+		JB incNumStock
+		
+		JMP checkEOF
 	
 	displayReportDetails:
 		CALL rptStockDetails
@@ -82,6 +94,8 @@ rptDetails PROC
 		MOV numStockFound, 0
 		CALL closeReadFile
 		
+		CMP choice, 4
+		JE reportEnd
 		CMP choice, 3
 		JE displayInvDivider
 		
@@ -109,17 +123,19 @@ rptDetails PROC
 		CMP choice, 3
 		JE displaySumOfStockValue
 		
+		print_Newline
+		
 		JMP reportEnd
 		
 		displaySumOfStockValue:
 			delimiter
 			CALL sumOfStockValue
+			print_Newline
 		
 		reportEnd:
 			RET
 	
 rptDetails ENDP
-
 
 ;-----------------------------------------------
 ;	rptStockDetails
@@ -196,11 +212,13 @@ rptStockDetails PROC
 	
 	delimiter
 	
-	CMP choice,1
+	CMP choice, 1
 	JE qtyIn
-	CMP choice,2
+	CMP choice, 2
 	JE qtyOut
-	CMP choice,3
+	CMP choice, 3
+	JE qtyInv
+	CMP choice, 4
 	JE qtyInv
 	
 	qtyIn:
@@ -226,6 +244,9 @@ rptStockDetails PROC
 		CALL displayNumber
 		CALL fillSpace
 		
+		CMP choice, 4
+		JE reportDetailsEnd
+		
 		delimiter
 		
 		CALL calStockValues
@@ -234,7 +255,6 @@ rptStockDetails PROC
 		RET
 	
 rptStockDetails ENDP
-
 
 ;---------------------------------------------
 ;	sumOfStock
