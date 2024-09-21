@@ -8,16 +8,20 @@
 ;	display the search result title
 ;-----------------------------------------
 displaySearchTitle PROC
+
 	displayDivider
-	print_newLine
+	print_NewLine
+	
 	MOV AH, 09H
 	LEA DX, stockDetailsTitle
 	INT 21H
-	print_newLine
+	
+	print_NewLine
 	displayDivider
-	print_newLine
+	print_NewLine
 	
 	RET
+	
 displaySearchTitle ENDP
 
 ;-----------------------------------------
@@ -25,7 +29,8 @@ displaySearchTitle ENDP
 ;	display the Stock Details
 ;-----------------------------------------
 displayStockDetails PROC
-	MOV AX, 0
+
+	resetAX
 	MOV AL, numStockFound
 	DIV ten8Bits
 	
@@ -125,13 +130,11 @@ displayStockDetails PROC
 	CALL displayNumber
 	CALL fillSpace
 	
-	MOV AH, 09H
-	LEA DX, newLine
-	INT 21H
+	print_NewLine
 	
 	RET
+	
 displayStockDetails ENDP
-
 
 ;-------------------------------------------
 ;	displayNumber
@@ -139,27 +142,31 @@ displayStockDetails ENDP
 ;	of space need to fill into CX
 ;-------------------------------------------
 displayNumber PROC
-	MOV CX, 0
-displayNumberLoop:
-	DIV ten16Bits
-	PUSH DX
-	INC CX
-	MOV DX, 0000H
-	CMP AX, DX
-	JNE displayNumberLoop
 
-printNumber:
-	DEC BX
-	POP AX
-	MOV AH, 02H
-	MOV DL, AL
-	ADD DL, 30H
-	INT 21H
-LOOP printNumber
-	MOV CX, 0
+	resetCX
+	
+	displayNumberLoop:
+		DIV ten16Bits
+		PUSH DX
+		INC CX
+		MOV DX, 0000H
+		CMP AX, DX
+		JNE displayNumberLoop
+
+	printNumber:
+		DEC BX
+		POP AX
+		MOV AH, 02H
+		MOV DL, AL
+		ADD DL, 30H
+		INT 21H
+	LOOP printNumber
+	
+	resetCX
 	MOV CX, BX
 	
 	RET
+	
 displayNumber ENDP
 
 
@@ -169,13 +176,14 @@ displayNumber ENDP
 ;---------------------------------------
 fillSpace PROC
 
-autoFillSpace:
-	MOV AL, ' '
-	MOV AH, 02H
-	MOV DL, AL
-	INT 21H
-LOOP autoFillSpace
+	autoFillSpace:
+		MOV AL, ' '
+		MOV AH, 02H
+		MOV DL, AL
+		INT 21H
+	LOOP autoFillSpace
 
 	RET
+	
 fillSpace ENDP
 	

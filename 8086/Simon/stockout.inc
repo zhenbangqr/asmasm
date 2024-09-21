@@ -5,6 +5,7 @@
 	promptStockOutQty DB "Enter Stock Out Quantity: $"
 	stockOutSuccessMsg DB "Stock out sucessfull$"
 	notEnoughStock DB "Stock No Enough!$"
+	
 .CODE
 
 ;-----------------------------------------------

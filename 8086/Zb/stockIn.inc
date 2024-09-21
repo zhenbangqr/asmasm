@@ -137,10 +137,7 @@ compareAndStockIn PROC
 		LEA DX, invalidInputMsg
 		INT 21H
     
-		MOV AH, 09H
-		LEA DX, newLine
-		INT 21H
-		
+		print_NewLine
 		pause
 		clnScr
 

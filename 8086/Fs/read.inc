@@ -121,8 +121,7 @@ findFileError PROC
 
 	exitReadFile:
 		CALL closeReadFile
-		
-	RET
+		RET
 	
 findFileError ENDP
 	
@@ -247,7 +246,7 @@ readStaffDetails PROC
 	CALL readStringFromFile
 	
 	CALL jumpToNextLine
-
+	
 	RET
 	
 readStaffDetails ENDP
@@ -352,8 +351,9 @@ checkIsDigit PROC
 
 	isDigit:
 		MOV digitValidate, 1
-		RET
 		
+	RET
+	
 checkIsDigit ENDP
 
 ;----------------------------------------

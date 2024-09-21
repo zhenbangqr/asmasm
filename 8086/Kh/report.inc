@@ -5,11 +5,14 @@
 	stockRptDetails DB "No.|Phone Name     |RAM       |ROM       |Color     |Quantity", 0DH, 0AH, "$"
 	stockRptDetailsDivider DB "===|===============|==========|==========|==========|==========", 0DH, 0AH, "$"
 	stockRptTotal DB "                                               Total|$"
+	
 	totalStock DD 0
+	
 	stockValue DD 0
 	stockValueFP DD 0
 	totalStockValue DD 0
 	totalStockValueFP DD 0
+	
 	profit DD 0
 	profitFP DD 0
 	totalProfit DD 0
@@ -170,7 +173,7 @@ rptDetails ENDP
 ;-----------------------------------------------
 rptStockDetails PROC
 
-	MOV AX, 0
+	resetAX
 	MOV AL, numStockFound
 	DIV ten8Bits
 	
@@ -251,7 +254,7 @@ rptStockDetails PROC
 	JE qtyInv
 	
 	qtyIn:
-		MOV BX,10
+		MOV BX, 10
 		MOV AX, WORD PTR Stock.totalStockInQty
 		MOV DX, WORD PTR Stock.totalStockInQty + 2
 		CALL displayNumber
@@ -259,7 +262,7 @@ rptStockDetails PROC
 		JMP reportDetailsEnd
 		
 	qtyOut:
-		MOV BX,10
+		MOV BX, 10
 		MOV AX, WORD PTR Stock.totalStockOutQty
 		MOV DX, WORD PTR Stock.totalStockOutQty + 2
 		CALL displayNumber
@@ -267,7 +270,7 @@ rptStockDetails PROC
 		JMP reportDetailsEnd
 		
 	qtyInv:
-		MOV BX,10
+		MOV BX, 10
 		MOV AX, WORD PTR Stock.phoneQty
 		MOV DX, WORD PTR Stock.phoneQty + 2
 		CALL displayNumber
