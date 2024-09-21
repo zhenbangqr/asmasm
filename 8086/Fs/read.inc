@@ -4,7 +4,8 @@
     readBuffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
 	fileErrorMsg DB "Error Occured!$"
-.code
+	
+.CODE
 
 ;--------------------------------------------
 ;	openReadStockFile
@@ -30,9 +31,8 @@ openReadStaffFile PROC
 	LEA SI, readBuffer
 	
 	RET
-
+	
 openReadStaffFile ENDP
-
 
 ;--------------------------------------------
 ;	openReadStockFile
@@ -57,7 +57,7 @@ openReadStockFile PROC
 	LEA SI, readBuffer
 	
 	RET
-
+	
 openReadStockFile ENDP
 
 ;--------------------------------------------
@@ -71,7 +71,7 @@ openReadTempFile PROC
 	MOV DX, OFFSET tempFileName
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
-	mov fileHandle, AX			;Store File Handle
+	MOV fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
 	LEA DX, readBuffer			;Address for buffer
@@ -83,30 +83,28 @@ openReadTempFile PROC
 	LEA SI, readBuffer
 	
 	RET
-
+	
 openReadTempFile ENDP
-
-
 
 ;------------------------------------------------------
 ;	closeStockFile
 ;	close the stock file(Phone.txt)
 ;------------------------------------------------------
 closeReadFile PROC
+
 	CALL clearReadFileBuffer
 	
-	mov bx, fileHandle
-    mov ah, 3Eh             ; DOS function: close file
-    int 21h
-    jc fileError            ; If carry flag is set, an error occurred
+	MOV BX, fileHandle
+    MOV AH, 3EH             ; DOS function: close file
+    INT 21H
+    JC fileError            ; If carry flag is set, an error occurred
 	
 	RET
+	
 closeReadFile ENDP
-
 
 fileError:
 	CALL findFileError
-
 
 ;--------------------------------------------------
 ;	findFileError
@@ -114,15 +112,18 @@ fileError:
 ;	and close the file
 ;--------------------------------------------------	
 findFileError PROC
-    ; Handle file error
-    mov ah, 09h
-    lea dx, fileErrorMsg
-    int 21h
-    jmp exitReadFile
 
-exitReadFile:
-    call closeReadFile
+    ; Handle file error
+    MOV AH, 09H
+    LEA DX, fileErrorMsg
+    INT 21H
+    JMP exitReadFile
+
+	exitReadFile:
+		CALL closeReadFile
+		
 	RET
+	
 findFileError ENDP
 	
 ;-------------------------------------------------------
@@ -146,15 +147,15 @@ readStringFromFile PROC
 		MOV [DI], AL
 		INC SI
 		RET
-	
+		
 readStringFromFile ENDP
-
 
 ;----------------------------------------
 ;	readNumber
 ;	read the number from file
 ;----------------------------------------
 readNumber PROC
+
 	resetAX
 	resetBX
 	resetCX
@@ -184,15 +185,15 @@ readNumber PROC
 	endReadNumber:
 		INC SI
 		RET
-
+		
 readNumber ENDP
-
 
 ;---------------------------------------
 ;	readStockDetails
 ;	Read one line of the file
 ;---------------------------------------
 readStockDetails PROC
+
 	LEA DI, Stock.phoneName
 	CALL readStringFromFile
 
@@ -228,6 +229,7 @@ readStockDetails PROC
 	CALL jumpToNextLine
 	
 	RET
+	
 readStockDetails ENDP
 
 ;-------------------------------------------------
@@ -235,17 +237,19 @@ readStockDetails ENDP
 ;	read the staff id and password from the file
 ;-------------------------------------------------
 readStaffDetails PROC
+
 	LEA DI, Staff.userID
-	MOV CX, 0
+	resetCX
 	CALL readStringFromFile
 	
 	LEA DI, Staff.userPw
-	MOV CX, 0
+	resetCX
 	CALL readStringFromFile
 	
 	CALL jumpToNextLine
 
 	RET
+	
 readStaffDetails ENDP
 
 ;-------------------------------------------------
@@ -253,6 +257,7 @@ readStaffDetails ENDP
 ;	Jump to the next line in a file while reading
 ;-------------------------------------------------
 jumpToNextLine PROC
+
 	nextLineCheck:
 		MOV AL, [SI]
 		CMP AL, 0DH
@@ -279,7 +284,8 @@ jumpToNextLine ENDP
 ;	calculate the length of the string
 ;-------------------------------------------------
 calculateStringLength PROC
-	MOV BX, 0
+
+	resetBX
 	
 	countStringLength:
 			;--Count the length of string by comparing '$' symbol
@@ -294,7 +300,7 @@ calculateStringLength PROC
 			
 	endReadStringLength:
 		RET
-	
+		
 calculateStringLength ENDP
 
 ;----------------------------------------------------------
@@ -302,6 +308,7 @@ calculateStringLength ENDP
 ;	input and check whether the input is all digit or not
 ;----------------------------------------------------------
 inputQuantity PROC
+
 	MOV AH, 0AH
 	LEA DX, inputNumber
 	INT 21H
@@ -311,6 +318,7 @@ inputQuantity PROC
 	CALL checkIsDigit
 	
 	RET
+	
 inputQuantity ENDP
 
 ;-----------------------------------------------------------
@@ -318,6 +326,7 @@ inputQuantity ENDP
 ;	checkWhether a string enter is all digit
 ;-----------------------------------------------------------
 checkIsDigit PROC
+
 	MOV DI, 2
 	
 	cmpIsDigit:
@@ -344,7 +353,7 @@ checkIsDigit PROC
 	isDigit:
 		MOV digitValidate, 1
 		RET
-	
+		
 checkIsDigit ENDP
 
 ;----------------------------------------
@@ -352,6 +361,7 @@ checkIsDigit ENDP
 ;	convert string become number
 ;----------------------------------------
 stringToNumber PROC
+
 	resetAX
 	resetBX
 	resetCX
@@ -380,21 +390,21 @@ stringToNumber PROC
 	
 	endConvertNumber:
 		RET
-
+		
 stringToNumber ENDP
-
 
 ;-------------------------------------
 ;	clearReadBuffer
 ;	clear the buffer
 ;-------------------------------------
 clearReadBuffer PROC
+
 	MOV CX, 20
     MOV AL, 0             ; Value to fill the buffer (zero in this case)
 	
-clearBufferLoop:
-    MOV [DI], AL          ; Store value AL at address DI
-    INC DI     	          ; Move to the next byte
+	clearBufferLoop:
+		MOV [DI], AL          ; Store value AL at address DI
+		INC DI     	          ; Move to the next byte
     LOOP clearBufferLoop
 	
 	RET
@@ -420,7 +430,7 @@ clearStockVariableBuffer PROC
 	LEA DI, Stock.phoneColor
 	CALL clearReadBuffer
 
-	MOV AX, 0
+	resetAX
 	MOV WORD PTR Stock.phonePrice, AX
 	MOV WORD PTR Stock.phonePrice + 2, AX
 
@@ -437,22 +447,25 @@ clearStockVariableBuffer PROC
 	MOV WORD PTR Stock.totalStockOutQty + 2, AX
 	
 	RET
+	
 clearStockVariableBuffer ENDP
-
 
 ;----------------------------------------------------
 ;	clearReadFileBuffer
 ;	clear the read buffer
 ;----------------------------------------------------
 clearReadFileBuffer PROC
+
 	;clear the Buffer
-		MOV CX, 1024  ; Buffer size
-		LEA DI, readBuffer
-		MOV AL, 0
+	MOV CX, 1024  ; Buffer size
+	LEA DI, readBuffer
+	MOV AL, 0
+	
 	clearReadBufferLoop:
 		MOV [DI], AL
 		INC DI
 		LOOP clearReadBufferLoop
 		
 	RET
+	
 clearReadFileBuffer ENDP

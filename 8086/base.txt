@@ -2,19 +2,19 @@
 .STACK 100
 .DATA
 
-		NL DB 0AH,0DH,'$'
-
-
+	NL DB 0AH, 0DH, '$'
+	
 .CODE
+
 MAIN PROC
 
-		MOV AX,@DATA
-		MOV DS,AX
-		
-		
-		
-		MOV AX,4C00H
-		INT 21H
-
+	MOV AX,@DATA
+	MOV DS,AX
+	
+	
+	
+	MOV AX,4C00H
+	INT 21H
+	
 MAIN ENDP
 END MAIN

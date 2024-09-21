@@ -9,36 +9,35 @@
 
 ;--Macro to reset a AX register 
 resetAX MACRO
-		
-		MOV AX,0
-		
-ENDM
 
+	MOV AX,0
+	
+ENDM
 
 ;--Macro to reset a BX register 
 resetBX MACRO
-		
-		MOV BX,0
+
+	MOV BX,0
 	
 ENDM
 
 ;--Macro to reset a CX register 
 resetCX MACRO
-		
-		MOV CX,0
+
+	MOV CX,0
 	
 ENDM
 
 ;--Macro to reset a DX register 
 resetDX MACRO
-		
-		MOV DX,0
+
+	MOV DX,0
 	
 ENDM
 
 ;--Macro to clear the screen
 clnScr MACRO
-	  
+
     MOV AH, 06H    ; Scroll up window
     MOV AL, 00H    ; Scroll entire window
     MOV BH, 07H    ; Set attribute (light gray on black)
@@ -63,18 +62,19 @@ print_NewLine MACRO
     MOV AH, 09H
     LEA DX, newLine
     INT 21H
-
+	
 ENDM
 	
 ;--Macro to print divider
 displayDivider MACRO
-	
+
 	MOV AH,09H
 	LEA DX,divider
 	INT 21H
 	
 ENDM
 
+;--Macro to print divider for report
 rptDivider MACRO
 
 	MOV AH,09H
@@ -83,6 +83,7 @@ rptDivider MACRO
 	
 ENDM
 
+;--Macro to print current stock and phone profit divider
 csppDivider MACRO
 
 	MOV AH,09H
@@ -93,7 +94,7 @@ ENDM
 
 ;--Macro to print delimiter
 delimiter MACRO
-	
+
 	MOV AH,02H
 	MOV DL,"|"
 	INT 21H
@@ -102,7 +103,7 @@ ENDM
 
 ;--Macro to pause the screen
 pause MACRO
-	
+
 	MOV AH, 09H
 	LEA DX, pausePrompt
 	INT 21H
@@ -112,12 +113,11 @@ pause MACRO
 	
 ENDM
 
-;--Macro to pause the screen
+;--Macro to display a space on the screen
 space MACRO
-	
+
 	MOV AH, 02H
 	MOV DL, ' '
     INT 21H
 	
 ENDM
-

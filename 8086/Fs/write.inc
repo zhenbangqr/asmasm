@@ -1,4 +1,4 @@
-.data  
+.DATA  
 	stockFileTitle DB "Name;RAM;ROM;Color;Price;Qty;StockInQty;StockOutQty;$"
 
 	errorMsg DB "Error find file$"
@@ -8,9 +8,11 @@
 	bufferIndex DW 0
 	tempFileName DB 'temp.txt', 0
 	fileHandleWrite DW ?         ; To store the file handle
-.code
+	
+.CODE
 
 openWriteTempFile PROC
+
 	MOV AH, 3DH					;Open file
 	MOV AL, 1					;Open for write
 	MOV DX, OFFSET tempFileName
@@ -18,9 +20,11 @@ openWriteTempFile PROC
 	mov fileHandleWrite, AX			;Store File Handle
 	
 	RET
+	
 openWriteTempFile ENDP
 
 openWriteStockFile PROC
+
 	MOV AH, 3DH					;Open file
 	MOV AL, 1					;Open for write
 	MOV DX, OFFSET stockFileName
@@ -28,14 +32,17 @@ openWriteStockFile PROC
 	mov fileHandleWrite, AX			;Store File Handle
 	
 	RET
+	
 openWriteStockFile ENDP
 
 closeWriteFile PROC
+
 	MOV BX, fileHandleWrite
 	MOV AH, 3EH
 	INT 21H
 	
 	RET
+	
 closeWriteFile ENDP
 
 ;----------------------------------------
@@ -43,6 +50,7 @@ closeWriteFile ENDP
 ;	write the title of the stock file
 ;----------------------------------------
 writeStockFileTitle PROC
+
 	MOV SI, bufferIndex
 	LEA SI, writeBuffer
 
@@ -59,6 +67,7 @@ writeStockFileTitle PROC
 	CALL writeStockFile
 	
 	RET
+	
 writeStockFileTitle ENDP
 
 ;----------------------------------------
@@ -66,6 +75,7 @@ writeStockFileTitle ENDP
 ;	append the data to the write buffer
 ;----------------------------------------
 appendToBuffer PROC
+
 	PUSH SI ;This SI hold the readFilePointer
 	
 	MOV SI, bufferIndex
@@ -150,10 +160,9 @@ appendToBuffer PROC
 	
 	CALL writeStockFile
 	
-	
-	
 	POP SI
 	RET
+	
 appendToBuffer ENDP
 
 ;-----------------------------------------------
@@ -161,6 +170,7 @@ appendToBuffer ENDP
 ;	append the string
 ;-----------------------------------------------
 appendString PROC
+
 	MOV AL, [DI]
 	CMP AL, '$'
 	JE doneAppending
@@ -170,8 +180,9 @@ appendString PROC
 	INC SI
 	JMP appendString
 
-doneAppending:
-	RET
+	doneAppending:
+		RET
+		
 appendString ENDP
 
 
@@ -180,6 +191,7 @@ appendString ENDP
 ;	write the buffer to the file
 ;---------------------------------
 writeStockFile PROC
+
 	LEA DI, writeBuffer
 	CALL countBufferLength
 
@@ -192,17 +204,19 @@ writeStockFile PROC
 	LEA DI, writeBuffer
 	
 	;clear the Buffer
-		MOV CX, bufferLength  ; Buffer size
-		LEA DI, writeBuffer
-		MOV AL, 0
+	MOV CX, bufferLength  ; Buffer size
+	LEA DI, writeBuffer
+	MOV AL, 0
+	
 	clearLoop:
 		MOV [DI], AL
 		INC DI
 		LOOP clearLoop
 
 	MOV bufferIndex, 0
-
+	
 	RET
+	
 writeStockFile ENDP
 
 
@@ -211,22 +225,27 @@ writeStockFile ENDP
 ;	count the length of the buffer for writting
 ;-----------------------------------------------
 countBufferLength PROC
-	MOV BX, 0
-	MOV AX, 0 
+
+	resetBX
+	resetAX
+	
 	countLengthOfBuffer:
-			;--Count the length of string by comparing '$' symbol
-			
-			MOV AL, [DI]
-			
-			CMP AL, '$';
-			JE endReadBufferLength
-			INC DI
-			INC BL
-			JMP countLengthOfBuffer
-			
+		;--Count the length of string by comparing '$' symbol
+		
+		MOV AL, [DI]
+		
+		CMP AL, '$';
+		JE endReadBufferLength
+		
+		INC DI
+		INC BL
+		
+		JMP countLengthOfBuffer
+		
 	endReadBufferLength:
 		MOV bufferLength, BX
 		RET
+		
 countBufferLength ENDP
 
 ;---------------------------------------
@@ -234,7 +253,9 @@ countBufferLength ENDP
 ;	append the number 
 ;---------------------------------------
 appendNumber PROC
-	MOV CX, 0
+
+	resetCX
+	
 	appendNumberLoop:
 		DIV ten16Bits
 		PUSH DX
@@ -251,6 +272,7 @@ appendNumber PROC
 	LOOP appendNumberToBuffer
 	
 	RET
+	
 appendNumber ENDP
 
 ;----------------------------------------------------
@@ -258,6 +280,7 @@ appendNumber ENDP
 ;	change the new file name and clear the older one
 ;----------------------------------------------------
 updateStockFileName PROC
+
 	CALL openWriteStockFile
 	CALL writeStockFileTitle
 	
@@ -290,9 +313,9 @@ updateStockFileName PROC
 		RET
 	
 	handleError:
-    ; Handle the error (you can print an error message or take appropriate action)
-    MOV AH, 09h          ; Print error message
-    LEA DX, errorMsg
-    INT 21H
-
+		; Handle the error (you can print an error message or take appropriate action)
+		MOV AH, 09h          ; Print error message
+		LEA DX, errorMsg
+		INT 21H
+		
 updateStockFileName ENDP
