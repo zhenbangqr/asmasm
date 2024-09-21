@@ -10,8 +10,8 @@
 	stockValueFP DD 0
 	totalStockValue DD 0
 	totalStockValueFP DD 0
-	profit DD ?
-	profitFP DD ?
+	profit DD 0
+	profitFP DD 0
 	totalProfit DD 0
 	totalProfitFP DD 0
 	sumOfTotalProfit DD 0
@@ -84,8 +84,7 @@ rptDetails PROC
 		
 		incNumStock:
 			INC numStockFound
-		
-		CALL sumOfStock
+			CALL sumOfStock
 		
 		JMP displayReportDetails
 	
@@ -104,7 +103,6 @@ rptDetails PROC
 	
 	displayReportDetails:
 		CALL rptStockDetails
-		print_Newline
 		
 		JMP checkEOF
 	
@@ -145,20 +143,22 @@ rptDetails PROC
 		CMP choice, 5
 		JE displaySumTotalProfit
 		
+		print_Newline
 		JMP reportEnd
 		
 		displaySumStockValue:
 			delimiter
 			CALL displaySumOfStockValue
+			print_Newline
 			
 			JMP reportEnd
 			
 		displaySumTotalProfit:
 			delimiter
 			CALL displaySumOfTotalProfit
+			print_Newline
 		
 		reportEnd:
-			print_Newline
 			RET
 	
 rptDetails ENDP
@@ -290,6 +290,7 @@ rptStockDetails PROC
 			CALL calProfit
 	
 	reportDetailsEnd:
+		print_Newline
 		RET
 	
 rptStockDetails ENDP
@@ -410,11 +411,11 @@ displaySumOfStockValue PROC
 	MOV DX, WORD PTR totalStockValueFP + 2
 	CALL displayFloatingPoint
 	
-	MOV WORD PTR stockValue, 0
-	MOV WORD PTR stockValue + 2, 0
+	MOV WORD PTR totalStockValue, 0
+	MOV WORD PTR totalStockValue + 2, 0
 	
-	MOV WORD PTR stockValueFP, 0
-	MOV WORD PTR stockValueFP + 2, 0
+	MOV WORD PTR totalStockValueFP, 0
+	MOV WORD PTR totalStockValueFP + 2, 0
 	
 	RET
 	

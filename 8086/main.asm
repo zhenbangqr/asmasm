@@ -4,17 +4,14 @@
 	ten8Bits DB 10
 	ten16Bits DW 10
 	hundred16bits DW 100
+	
     choice DB ?
 	searchCheck DB 0
 	numStockFound DB 0
 	digitValidate DB 1
-    newLine DB 0DH,0AH,"$"    ; Newline definition
-	invalidInputMsg db "Invalid input. Please Enter a valid input.", 0dh, 0ah, "$"  	
-	MSG1 db "Enter stock in quantity: $"
-	MSG2 db "STOCK OUT$"
-	MSG3 db "SEARCH$"
-	MSG4 db "GENERATE$"
-	MSG5 db "EXIT$"
+    newLine DB 0DH, 0AH, "$"    ; Newline definition
+	invalidInputMsg DB "Invalid input. Please Enter a valid input.", 0DH, 0AH, "$"  	
+	exitMessage DB "EXIT", 0DH, 0AH, "$"
 
 	user STRUC
 		userID DB 20 DUP(?)
@@ -58,41 +55,39 @@ MAIN PROC
 	
 	clnScr
 
-mainPageLoop:
-	CALL loginPage
+	mainPageLoop:
+		CALL loginPage
+		
+		CMP choice, 1
+		JE loginLoop
+		
+		JMP exitProgram
+		
+	loginLoop:
+		CALL user_login
+		
+	menuLoop:
+		CALL user_Menu    ; Call the user menu function
+		
+		; Go To Choice
+		CMP choice, 1
+		JE stockIn
+		CMP choice, 2
+		JE stockOut
+		CMP choice, 3
+		JE searchStock
+		CMP choice, 4
+		JE generateReport
+		
+		JMP logOut
 	
-	CMP choice, 1
-	JE loginLoop
+	generateReport:
+		MOV numStockFound, 0
+		CALL reportMenu
+		
+		JMP menuLoop
 	
-	JMP exitProgram
-	
-loginLoop:
-	CALL user_login
-	
-menuLoop:
-	
-    CALL user_Menu    ; Call the user menu function
-	
-    ; Go To Choice
-    CMP choice, 1
-    JE stockIn
-    CMP choice, 2
-    JE stockOut
-    CMP choice, 3
-    JE searchStock
-    CMP choice, 4
-    JE generateReport
-	
-    JMP logOut
-
-generateReport:
-	MOV numStockFound, 0
-	CALL reportMenu
-	
-    JMP menuLoop
-
-stockOut:
-	stockOutProcess:
+	stockOut:
 		MOV numStockFound, 0
 		CALL stockOutMenu
 		
@@ -103,10 +98,9 @@ stockOut:
 		CALL closeReadFile
 		CALL closeWriteFile
 		CALL updateStockFileName
-		JMP stockOutProcess
-
-searchStock:
-	searchStockLoop:
+		JMP stockOut
+	
+	searchStock:
 		MOV numStockFound, 0
 		CALL searchMenu
 		
@@ -115,17 +109,16 @@ searchStock:
 		
 		CALL inputAndSearch
 		CALL closeReadFile
-		JMP searchStockLoop
-
-logOut:
-	CALL logOutComfirm
+		JMP searchStock
 	
-	CMP choice, 2
-	JE menuLoop
-	JMP mainPageLoop
-
-stockIn:
-	stockInProcess:
+	logOut:
+		CALL logOutComfirm
+		
+		CMP choice, 2
+		JE menuLoop
+		JMP mainPageLoop
+	
+	stockIn:
 		MOV numStockFound, 0
 		CALL stockInMenu
 		
@@ -136,19 +129,15 @@ stockIn:
 		CALL closeReadFile
 		CALL closeWriteFile
 		CALL updateStockFileName
-		JMP stockInProcess
-
-exitProgram:
-	MOV AH,09H
-    LEA DX, MSG5
-    INT 21H
+		JMP stockIn
 	
-	MOV AH, 09H
-    LEA DX, newLine
-    INT 21H
-    
-	MOV AX, 4C00H
-    INT 21H
+	exitProgram:
+		MOV AH,09H
+		LEA DX, exitMessage
+		INT 21H
+		
+		MOV AX, 4C00H
+		INT 21H
 
 MAIN ENDP
 END MAIN

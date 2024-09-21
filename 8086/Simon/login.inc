@@ -19,7 +19,7 @@
 	inputUserPassword DB 20 DUP("$")
 	
 	loginFailMsg DB "Invalid User-ID or Password, please try again.$"
-	loginSucMsg DB " Login successfully$"
+	loginSucMsg DB "Login successfully$"
 	
 .CODE
 
