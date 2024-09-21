@@ -10,28 +10,28 @@
 ;--Macro to reset a AX register 
 resetAX MACRO
 
-	MOV AX,0
+	MOV AX, 0
 	
 ENDM
 
 ;--Macro to reset a BX register 
 resetBX MACRO
 
-	MOV BX,0
+	MOV BX, 0
 	
 ENDM
 
 ;--Macro to reset a CX register 
 resetCX MACRO
 
-	MOV CX,0
+	MOV CX, 0
 	
 ENDM
 
 ;--Macro to reset a DX register 
 resetDX MACRO
 
-	MOV DX,0
+	MOV DX, 0
 	
 ENDM
 
@@ -68,8 +68,8 @@ ENDM
 ;--Macro to print divider
 displayDivider MACRO
 
-	MOV AH,09H
-	LEA DX,divider
+	MOV AH, 09H
+	LEA DX, divider
 	INT 21H
 	
 ENDM
@@ -77,8 +77,8 @@ ENDM
 ;--Macro to print divider for report
 rptDivider MACRO
 
-	MOV AH,09H
-	LEA DX,reportDivider
+	MOV AH, 09H
+	LEA DX, reportDivider
 	INT 21H
 	
 ENDM
@@ -86,7 +86,7 @@ ENDM
 ;--Macro to print current stock and phone profit divider
 csppDivider MACRO
 
-	MOV AH,09H
+	MOV AH, 09H
 	LEA DX, currStockPhoneProfitDivider
 	INT 21H
 	
@@ -95,8 +95,8 @@ ENDM
 ;--Macro to print delimiter
 delimiter MACRO
 
-	MOV AH,02H
-	MOV DL,"|"
+	MOV AH, 02H
+	MOV DL, "|"
 	INT 21H
 	
 ENDM
@@ -108,7 +108,7 @@ pause MACRO
 	LEA DX, pausePrompt
 	INT 21H
 	
-	MOV AH,01H
+	MOV AH, 01H
     INT 21H
 	
 ENDM

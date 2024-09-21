@@ -12,7 +12,7 @@
     newLine DB 0DH, 0AH, "$"    ; Newline definition
 	invalidInputMsg DB "Invalid input. Please Enter a valid input.", 0DH, 0AH, "$"  	
 	exitMessage DB "EXIT", 0DH, 0AH, "$"
-
+	
 	user STRUC
 		userID DB 20 DUP(?)
 		userPw DB 20 DUP(?)

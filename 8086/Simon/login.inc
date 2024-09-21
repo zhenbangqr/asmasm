@@ -55,10 +55,7 @@ loginPage PROC
 		LEA DX, invalidInputMsg
 		INT 21H
 		
-		MOV AH, 09H
-		LEA DX, newLine
-		INT 21H
-		
+		print_NewLine
 		pause
 		clnScr
 		
@@ -83,10 +80,7 @@ user_Login PROC
 		LEA DX, inputID
 		INT 21H
 		
-		;--Nextline
-		MOV AH, 09H
-		LEA DX, newLine
-		INT 21H
+		print_NewLine
 		
 		CALL openReadStaffFile
 		
@@ -163,7 +157,6 @@ user_Login PROC
 			LEA DX, inputPassword
 			INT 21H
 			
-			;--Nextline
 			print_NewLine
 		
 		getDefaultPasswordLength:
@@ -194,20 +187,14 @@ user_Login PROC
 				INC DI
 			LOOP userPasswordCompareLoop
 			
-			MOV AH,09H
-			LEA DX,newLine
-			INT 21H
+			print_NewLine
 			
 			; Display Success login
 			MOV AH,09H
 			LEA DX,loginSucMsg
 			INT 21H
 		
-			; New line
-			MOV AH,09H
-			LEA DX,newLine
-			INT 21H
-			
+			print_NewLine
 			pause
 			clnScr
 			
@@ -252,10 +239,7 @@ logOutComfirm PROC
 		LEA DX, invalidInputMsg
 		INT 21H
 		
-		MOV AH, 09H
-		LEA DX, newLine
-		INT 21H
-		
+		print_NewLine
 		pause
 		clnScr
 		

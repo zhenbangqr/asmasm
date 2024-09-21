@@ -32,7 +32,7 @@ searchMenu PROC
 		
 		MOV AH, 01H
 		INT 21H
-		SUB AL,30H
+		SUB AL, 30H
 		
 		print_NewLine
 		
@@ -155,13 +155,13 @@ cmpString PROC
 
 	MOV searchCheck, 0
 	MOV arrNum, 0
-	MOV BX, 0
+	resetBX
 	JMP compare
 	
 	compare:
 		MOV arrNum, BX
 		MOV DI, 2
-		MOV CX, 0
+		resetCX
 		MOV CL, searchInput[1]
 		
 		compareLoop:
