@@ -58,7 +58,7 @@ clnScr MACRO
 ENDM
 
 ;--Macro to print a newline
-print_newLine MACRO
+print_NewLine MACRO
 
     MOV AH, 09H
     LEA DX, newLine

@@ -49,7 +49,8 @@ INCLUDE Zb\stockIn.inc
 INCLUDE Kh\repMenu.inc
 INCLUDE Kh\report.inc
 
-MAIN PROC 
+MAIN PROC
+
     MOV AX,@DATA
     MOV DS,AX
 	
@@ -138,6 +139,6 @@ MAIN PROC
 		
 		MOV AX, 4C00H
 		INT 21H
-
+		
 MAIN ENDP
 END MAIN

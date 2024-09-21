@@ -1,5 +1,6 @@
 .DATA
-	stockDetailsTitle DB "No. Phone Name     | RAM       | ROM      | Color     | Price     | Quantity $"
+	stockDetailsTitle DB "No. Phone Name     | RAM       | ROM      | Color     | Price     | Quantity$"
+	
 .CODE
 
 ;-----------------------------------------

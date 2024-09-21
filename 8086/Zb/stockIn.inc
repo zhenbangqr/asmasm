@@ -1,16 +1,19 @@
 .DATA
-	stockInMenuTitle DB "========================================", 0dh, 0ah, "==            Stock In Menu           ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
-	enterStockInQtyTitle DB "========================================", 0dh, 0ah, "==       Enter Stock In Quantity      ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	stockInMenuTitle DB "========================================", 0DH, 0AH, "==            Stock In Menu           ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
+	enterStockInQtyTitle DB "========================================", 0DH, 0AH, "==       Enter Stock In Quantity      ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
 	continueStockInPrompt DB "1. Search stock for stock in", 0DH, 0AH, "2. Exit Search", 0DH, 0AH, "Please Enter Your Choice : $"
 	promptStockInQty DB "Enter Stock In Quantity: $"
 	stockInSuccessMsg DB "Stock in sucessfull$"
 	
-		inputNumber LABEL BYTE
-		numberLength DB 3
-		numberActNum DB ?
-		numberInputed DB 3 DUP("$")
+	inputNumber LABEL BYTE
+	numberLength DB 3
+	numberActNum DB ?
+	numberInputed DB 3 DUP("$")
+	
 .CODE
+
 stockInMenu PROC
+
 	MOV AH, 09H
 	LEA DX, stockInMenuTitle
 	INT 21H
@@ -37,19 +40,20 @@ stockInMenu PROC
 	RET
 	
 	invalidOfInput:
-	MOV AH, 09H
-	LEA DX, invalidInputMsg
-	INT 21H
+		MOV AH, 09H
+		LEA DX, invalidInputMsg
+		INT 21H
 	
 	print_NewLine
-	
 	pause
 	clnScr
 	
-	JMP stockInMenu	
+	JMP stockInMenu
+	
 stockInMenu ENDP
 
 compareAndStockIn PROC
+
 	MOV AH, 09H
 	LEA DX, searchTitle
 	INT 21H
@@ -141,5 +145,5 @@ compareAndStockIn PROC
 		clnScr
 
 		JMP enterStockInQty
-
+		
 compareAndStockIn ENDP

@@ -160,7 +160,7 @@ rptDetails PROC
 		
 		reportEnd:
 			RET
-	
+			
 rptDetails ENDP
 
 ;-----------------------------------------------
@@ -169,6 +169,7 @@ rptDetails ENDP
 ;	Eg. Phone Name, RAM, ROM, Color, Quantity
 ;-----------------------------------------------
 rptStockDetails PROC
+
 	MOV AX, 0
 	MOV AL, numStockFound
 	DIV ten8Bits
@@ -292,7 +293,7 @@ rptStockDetails PROC
 	reportDetailsEnd:
 		print_Newline
 		RET
-	
+		
 rptStockDetails ENDP
 
 ;---------------------------------------------
@@ -331,7 +332,7 @@ sumOfStock PROC
 		ADD WORD PTR totalStock + 2, DX
 	
 	RET
-
+	
 sumOfStock ENDP
 
 ;------------------------------------------------------
@@ -339,6 +340,7 @@ sumOfStock ENDP
 ;	calculate the stock value for each type of phone
 ;------------------------------------------------------
 calStockValue PROC
+
 	MOV AX, WORD PTR Stock.phonePrice
 	MOV DX, WORD PTR Stock.phonePrice + 2
 	
@@ -381,6 +383,7 @@ calStockValue PROC
 		
 		ADD WORD PTR totalStockValueFP, AX
 		ADD WORD PTR totalStockValueFP + 2, DX
+		
 	RET
 	
 calStockValue ENDP
@@ -390,6 +393,7 @@ calStockValue ENDP
 ;	calculate the sum of the stock value for all the phone
 ;------------------------------------------------------------
 displaySumOfStockValue PROC
+
 	;round the floating point and add to profit
 	MOV AX, WORD PTR totalStockValueFP
 	MOV DX, WORD PTR totalStockValueFP + 2
@@ -422,6 +426,7 @@ displaySumOfStockValue PROC
 displaySumOfStockValue ENDP
 
 calProfit PROC
+
 	MOV WORD PTR profit, 0
 	MOV WORD PTR profit + 2, 0
 	MOV WORD PTR profitFP, 0
@@ -520,7 +525,8 @@ calProfit PROC
 	
 calProfit ENDP
 
-displaySumOfTotalProfit PROC	
+displaySumOfTotalProfit PROC
+
 	;round the floating point and add to profit
 	MOV AX, WORD PTR sumOfTotalProfitFP
 	MOV DX, WORD PTR sumOfTotalProfitFP + 2

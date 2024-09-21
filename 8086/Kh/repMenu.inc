@@ -1,14 +1,14 @@
 .DATA
-	reportTitle DB      "==                          Report                           ==", 0DH, 0AH, "$"
-	reportChoice DB     "1. Current Inventory Stock", 0DH, 0AH, "2. Stock In Report", 0DH, 0AH, "3. Stock Out Report", 0DH, 0AH, "4. Low Stock Report", 0DH, 0AH, "5. Phone Profit Report", 0DH, 0AH, "6. Return", 0DH, 0AH, "$"
+	reportDivider DB "===============================================================", 0DH, 0AH, "$"
+	reportTitle DB "==                          Report                           ==", 0DH, 0AH, "$"
+	reportChoice DB "1. Current Inventory Stock", 0DH, 0AH, "2. Stock In Report", 0DH, 0AH, "3. Stock Out Report", 0DH, 0AH, "4. Low Stock Report", 0DH, 0AH, "5. Phone Profit Report", 0DH, 0AH, "6. Return", 0DH, 0AH, "$"
 	promptReportChoice DB "Enter a digit(1-6): $"
 	currStockPhoneProfitDivider DB "============================================================================", 0DH, 0AH, "$"
-	currStockTitle DB              "==                        Current Inventory Stock                         ==", 0DH, 0AH, "$"
-	phoneProfitTitle DB            "==                          Phone Profit Report                           ==", 0DH, 0AH, "$"
-	reportDivider DB    "===============================================================", 0DH, 0AH, "$"
-	stockInTitle DB     "==                      Stock In Report                      ==", 0DH, 0AH, "$"
-	stockOutTitle DB    "==                     Stock Out Report                      ==", 0DH, 0AH, "$"
-	lowStockTitle DB    "==                     Low Stock Report                      ==", 0DH, 0AH, "$"
+	currStockTitle DB "==                        Current Inventory Stock                         ==", 0DH, 0AH, "$"
+	stockInTitle DB "==                      Stock In Report                      ==", 0DH, 0AH, "$"
+	stockOutTitle DB "==                     Stock Out Report                      ==", 0DH, 0AH, "$"
+	lowStockTitle DB "==                     Low Stock Report                      ==", 0DH, 0AH, "$"
+	phoneProfitTitle DB "==                          Phone Profit Report                           ==", 0DH, 0AH, "$"
 	
 .CODE
 ;------------------------------------------------------
@@ -131,5 +131,5 @@ reportMenu PROC
 	rptMenuEnd:
 		pause
 		JMP rptList
-	
+		
 reportMenu ENDP

@@ -1,6 +1,6 @@
 .DATA
-	searchMenuTitle DB "========================================", 0dh, 0ah, "==             Search Menu            ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
-	searchTitle DB "========================================", 0dh, 0ah, "==             Search Phone           ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	searchMenuTitle DB "========================================", 0DH, 0AH, "==             Search Menu            ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
+	searchTitle DB "========================================", 0DH, 0AH, "==             Search Phone           ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
 	searchPrompt DB "Please enter phone name: $"
 	searchSucMsg DB "Here is your search results. Please select your next step. $"
 	searchFailMsg DB "No result found. Please select your next step. $"
@@ -12,6 +12,7 @@
 	searchStr DB 30 DUP("$") 
 	
 	arrNum DW 0
+	
 .CODE
 
 ;--------------------------------------------------------------
@@ -19,48 +20,44 @@
 ;	Ask user whether want to continue search the phone or not
 ;--------------------------------------------------------------
 searchMenu PROC
-nextStepChoiceLoop:
-	MOV AH, 09H
-	LEA DX, searchMenuTitle
-	INT 21H
-	
-	MOV AH, 09H
-	LEA DX, nextStepPrompt
-	INT 21H
-	
-	MOV AH, 01H
-	INT 21H
-	SUB AL,30H
-	
-	MOV AH, 09H
-	LEA DX, newLine
-	INT 21H
-	
-	CMP AL, 1
-	JB invalidInputChoice
-	CMP AL, 2
-	JA invalidInputChoice
-	
-	MOV choice, AL
-	
-	clnScr
-	
-	RET
-	
-invalidInputChoice:
-	MOV AH, 09H
-	LEA DX, invalidInputMsg
-	INT 21H
-	
-	MOV AH, 09H
-	LEA DX, newLine
-	INT 21H
-	
-	pause
-	clnScr
-	
-	JMP nextStepChoiceLoop
 
+	nextStepChoiceLoop:
+		MOV AH, 09H
+		LEA DX, searchMenuTitle
+		INT 21H
+		
+		MOV AH, 09H
+		LEA DX, nextStepPrompt
+		INT 21H
+		
+		MOV AH, 01H
+		INT 21H
+		SUB AL,30H
+		
+		print_NewLine
+		
+		CMP AL, 1
+		JB invalidInputChoice
+		CMP AL, 2
+		JA invalidInputChoice
+		
+		MOV choice, AL
+		
+		clnScr
+		
+		RET
+		
+	invalidInputChoice:
+		MOV AH, 09H
+		LEA DX, invalidInputMsg
+		INT 21H
+		
+		print_NewLine
+		pause
+		clnScr
+		
+		JMP nextStepChoiceLoop
+		
 searchMenu ENDP	
 
 ;----------------------------------------------
@@ -68,6 +65,7 @@ searchMenu ENDP
 ;	input a phone name and search the phone
 ;----------------------------------------------
 inputAndSearch PROC
+
 	MOV AH, 09H
 	LEA DX, searchTitle
 	INT 21H
@@ -126,7 +124,7 @@ inputAndSearch PROC
 		pause
 		clnScr
 		RET
-
+		
 inputAndSearch ENDP
 
 ;----------------------------------------------
@@ -134,6 +132,7 @@ inputAndSearch ENDP
 ;	Enter the phone name to search the stock
 ;----------------------------------------------
 searchPhoneStock PROC
+
 	MOV AH, 09H
 	LEA DX, searchPrompt
 	INT 21H
@@ -145,50 +144,50 @@ searchPhoneStock PROC
 	print_NewLine
 	
 	RET
-		
+	
 searchPhoneStock ENDP
-
-
 
 ;--------------------------------------------------------------
 ;	cmpString
 ;	compare the string read from file with the entered string
 ;--------------------------------------------------------------
 cmpString PROC
+
 	MOV searchCheck, 0
 	MOV arrNum, 0
 	MOV BX, 0
 	JMP compare
 	
-compare:
-	MOV arrNum, BX
-	MOV DI, 2
-	MOV CX, 0
-	MOV CL, searchInput[1]
-	
-	compareLoop:
-		MOV AL, Stock.phoneName[BX]
-		CMP AL, "$"
-		JE finish
-				
-		CMP AL, searchInput[DI]
-		JNE failCompare
+	compare:
+		MOV arrNum, BX
+		MOV DI, 2
+		MOV CX, 0
+		MOV CL, searchInput[1]
 		
-		INC BX
-		INC DI
-	LOOP compareLoop
-	
-	MOV searchCheck, 1
-
-	JMP finish
-
-failCompare:
-	INC arrNum
-	MOV BX, arrNum
-	JMP compare
-	
-finish:
-	RET
+		compareLoop:
+			MOV AL, Stock.phoneName[BX]
+			CMP AL, "$"
+			JE finish
+					
+			CMP AL, searchInput[DI]
+			JNE failCompare
+			
+			INC BX
+			INC DI
+		LOOP compareLoop
+		
+		MOV searchCheck, 1
+		
+		JMP finish
+		
+	failCompare:
+		INC arrNum
+		MOV BX, arrNum
+		JMP compare
+		
+	finish:
+		RET
+		
 cmpString ENDP
 
 ;--------------------------------------------------------------
@@ -196,6 +195,7 @@ cmpString ENDP
 ;	compare the string to find the string that are exact same
 ;--------------------------------------------------------------
 compareExactString PROC
+
 	MOV searchCheck, 0
 	getPhoneNameLength:
 		MOV DI, OFFSET Stock.phoneName
@@ -224,9 +224,7 @@ compareExactString PROC
 	MOV searchCheck, 1
 	INC numStockFound
 	
-finishCompare:
-	RET
+	finishCompare:
+		RET
+		
 compareExactString ENDP
-
-	
-	

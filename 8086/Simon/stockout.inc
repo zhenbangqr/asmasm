@@ -1,6 +1,6 @@
 .DATA
-	stockOutMenuTitle DB "========================================", 0dh, 0ah, "==           Stock Out Menu           ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
-	enterStockOutQtyTitle DB "========================================", 0dh, 0ah, "==      Enter Stock Out Quantity      ==", 0dh, 0ah, "========================================", 0dh,0ah, "$"
+	stockOutMenuTitle DB "========================================", 0DH, 0AH, "==           Stock Out Menu           ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
+	enterStockOutQtyTitle DB "========================================", 0DH, 0AH, "==      Enter Stock Out Quantity      ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
 	continueStockOutPrompt DB "1. Search stock for stock out", 0DH, 0AH, "2. Exit Search", 0DH, 0AH, "Please Enter Your Choice : $"
 	promptStockOutQty DB "Enter Stock Out Quantity: $"
 	stockOutSuccessMsg DB "Stock out sucessfull$"
@@ -12,6 +12,7 @@
 ;	menu for stock out
 ;-----------------------------------------------
 stockOutMenu PROC
+
 	MOV AH, 09H
 	LEA DX, stockOutMenuTitle
 	INT 21H
@@ -43,14 +44,15 @@ stockOutMenu PROC
 	INT 21H
 	
 	print_NewLine
-	
 	pause
 	clnScr
 	
-	JMP stockOutmenu	
+	JMP stockOutmenu
+	
 stockOutMenu ENDP
 
 compareAndStockOut PROC
+
 	MOV AH, 09H
 	LEA DX, searchTitle
 	INT 21H
@@ -131,7 +133,6 @@ compareAndStockOut PROC
 		CALL appendToBuffer
 		
 		JMP searchStockOut
-		
 	
 	InvalidStockOutQtyInput:
 		MOV AH, 09H
@@ -139,7 +140,6 @@ compareAndStockOut PROC
 		INT 21H
     
 		print_NewLine
-		
 		pause
 		clnScr
 
@@ -151,7 +151,6 @@ compareAndStockOut PROC
 		INT 21H
 		
 		print_NewLine
-		
 		pause
 		clnScr
 		
