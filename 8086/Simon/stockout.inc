@@ -53,7 +53,6 @@ stockOutMenu PROC
 stockOutMenu ENDP
 
 compareAndStockOut PROC
-
 	MOV AH, 09H
 	LEA DX, searchTitle
 	INT 21H

@@ -6,7 +6,7 @@
 	writeBuffer DB 1024 DUP(?)    ; Buffer to store file content
 	bufferLength DW ?
 	bufferIndex DW 0
-	tempFileName DB 'temp.txt', 0
+	tempFileName DB 'TEMP.TXT', 0
 	fileHandleWrite DW ?         ; To store the file handle
 	
 .CODE
@@ -152,10 +152,6 @@ appendToBuffer PROC
 	LEA DI, newLine
 	call appendString
 	
-	MOV AL, '$'
-	MOV [SI], AL
-	INC SI
-	
 	MOV bufferIndex, SI
 	
 	CALL writeStockFile
@@ -234,15 +230,16 @@ countBufferLength PROC
 		
 		MOV AL, [DI]
 		
-		CMP AL, '$';
+		CMP AL, 0DH;
 		JE endReadBufferLength
 		
 		INC DI
-		INC BL
+		INC BX
 		
 		JMP countLengthOfBuffer
 		
 	endReadBufferLength:
+		ADD BX, 2
 		MOV bufferLength, BX
 		RET
 		
@@ -253,7 +250,6 @@ countBufferLength ENDP
 ;	append the number 
 ;---------------------------------------
 appendNumber PROC
-
 	resetCX
 	
 	appendNumberLoop:
@@ -280,12 +276,22 @@ appendNumber ENDP
 ;	change the new file name and clear the older one
 ;----------------------------------------------------
 updateStockFileName PROC
+	; Delete the phone file and create again
+	MOV AH, 41h        	  ; DOS function to delete a file
+	LEA DX, stockFileName ; Address of file to delete (Phone.txt)
+	INT 21H            	  ; Call DOS
+
+	MOV AH, 3Ch         ; DOS function to create a file
+	LEA DX, stockFileName ; Address of the file name
+	MOV CX, 0           ; File attributes (0 = normal file)
+	INT 21H             ; Call DOS interrupt
 
 	CALL openWriteStockFile
 	CALL writeStockFileTitle
 	
 	CALL openReadTempFile
 	CALL jumpToNextLine
+	
 	
 	writeBackToOriginFile:
 		MOV AL, [SI]
