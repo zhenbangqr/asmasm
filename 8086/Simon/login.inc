@@ -160,7 +160,7 @@ user_Login PROC
 			print_NewLine
 		
 		getDefaultPasswordLength:
-			LEA DI,Staff.userID ;LEA DI,Staff.userID
+			LEA DI,Staff.userPw ;LEA DI,Staff.userID
 			CALL calculateStringLength
 			JMP compareTwoPasswordLength
 		

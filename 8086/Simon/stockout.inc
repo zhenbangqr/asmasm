@@ -3,7 +3,7 @@
 	enterStockOutQtyTitle DB "========================================", 0DH, 0AH, "==      Enter Stock Out Quantity      ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
 	continueStockOutPrompt DB "1. Search stock for stock out", 0DH, 0AH, "2. Exit Search", 0DH, 0AH, "Please Enter Your Choice : $"
 	promptStockOutQty DB "Enter Stock Out Quantity: $"
-	stockOutSuccessMsg DB "Stock out sucessfull$"
+	stockOutSuccessMsg DB "Stock out successful!$"
 	notEnoughStock DB "Stock No Enough!$"
 	
 .CODE

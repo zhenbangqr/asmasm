@@ -3,7 +3,7 @@
 	enterStockInQtyTitle DB "========================================", 0DH, 0AH, "==       Enter Stock In Quantity      ==", 0DH, 0AH, "========================================", 0DH, 0AH, "$"
 	continueStockInPrompt DB "1. Search stock for stock in", 0DH, 0AH, "2. Exit Search", 0DH, 0AH, "Please Enter Your Choice : $"
 	promptStockInQty DB "Enter Stock In Quantity: $"
-	stockInSuccessMsg DB "Stock in sucessfull$"
+	stockInSuccessMsg DB "Stock in successful!$"
 	
 	inputNumber LABEL BYTE
 	numberLength DB 3

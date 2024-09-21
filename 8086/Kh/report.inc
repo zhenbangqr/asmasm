@@ -137,9 +137,6 @@ rptDetails PROC
 			MOV DX, WORD PTR totalStock + 2
 			CALL displayNumber
 			CALL fillSpace
-			
-			MOV WORD PTR totalStock, 0
-			MOV WORD PTR totalStock + 2, 0
 		
 		CMP choice, 1
 		JE displaySumStockValue
@@ -162,6 +159,8 @@ rptDetails PROC
 			print_Newline
 		
 		reportEnd:
+			MOV WORD PTR totalStock, 0
+			MOV WORD PTR totalStock + 2, 0
 			RET
 			
 rptDetails ENDP
@@ -553,8 +552,8 @@ displaySumOfTotalProfit PROC
 	MOV DX, WORD PTR sumOfTotalProfitFP + 2
 	CALL displayFloatingPoint
 	
-	MOV WORD PTR sumOfTotalProfitFP, 0
-	MOV WORD PTR sumOfTotalProfitFP + 2, 0
+	MOV WORD PTR sumOfTotalProfit, 0
+	MOV WORD PTR sumOfTotalProfit + 2, 0
 	
 	MOV WORD PTR sumOfTotalProfitFP, 0
 	MOV WORD PTR sumOfTotalProfitFP + 2, 0
