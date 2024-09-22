@@ -10,7 +10,7 @@
 
 ;-----------------------------------------------
 ;	stockOutMenu
-;	menu for stock out
+;	menu to ask user want to stock out or not
 ;-----------------------------------------------
 stockOutMenu PROC
 
@@ -52,6 +52,11 @@ stockOutMenu PROC
 	
 stockOutMenu ENDP
 
+
+;-----------------------------------------------------------------------
+;	compareAndStockOut
+;	compare the search input to find the stock and continue stock out
+;-----------------------------------------------------------------------
 compareAndStockOut PROC
 	MOV AH, 09H
 	LEA DX, searchTitle

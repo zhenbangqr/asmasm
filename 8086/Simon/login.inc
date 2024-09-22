@@ -23,6 +23,10 @@
 	
 .CODE
 
+;--------------------------------------------------
+;	loginPage
+;	ask user want to login or not
+;--------------------------------------------------
 loginPage PROC
 
 	loginComfirmationLoop:
@@ -63,6 +67,11 @@ loginPage PROC
 		
 loginPage ENDP
 
+;--------------------------------------------
+;	user_Login
+;	prompt user enter the id and Password
+;	then, validate the id and Password
+;--------------------------------------------
 user_Login PROC
 	getUserIDInput:
 		;--Display the login title
@@ -203,8 +212,10 @@ user_Login PROC
 user_Login ENDP
 
 
-
-
+;-------------------------------------------
+;	logOutComfirm
+;	let user comfrim want to logout or not
+;-------------------------------------------
 logOutComfirm PROC
 
 	logOutComfirmationLoop:

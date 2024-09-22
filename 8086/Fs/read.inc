@@ -21,7 +21,7 @@ openReadStaffFile PROC
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
-	LEA DX, readBuffer				;Address for buffer
+	LEA DX, readBuffer			;Address for buffer
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
@@ -54,7 +54,7 @@ openReadStockFile PROC
 	INT 21H
 	JC fileError				;Jump when carry flag set(error when open file)
 	
-	LEA SI, readBuffer
+	LEA SI, readBuffer			;point si to the offset address of readBuffer
 	
 	RET
 	
@@ -133,7 +133,7 @@ readStringFromFile PROC
 
 	continueReadString:
 		MOV AL, [SI]
-		CMP AL, ';'
+		CMP AL, ';'			;read until delimiter
 		JE endReadString
 	
 		MOV [DI], AL 
@@ -309,12 +309,12 @@ calculateStringLength ENDP
 inputQuantity PROC
 
 	MOV AH, 0AH
-	LEA DX, inputNumber
+	LEA DX, inputNumber ;input
 	INT 21H
 	
 	print_NewLine
 	
-	CALL checkIsDigit
+	CALL checkIsDigit	;go to check the input is digit or not
 	
 	RET
 	
@@ -373,6 +373,7 @@ stringToNumber PROC
 	MOV AX, BX
 	INC DI
 	
+	;convert the string to number
 	continueConvertNumber:
 		MOV BL, [DI]
 		CMP BL,	0DH

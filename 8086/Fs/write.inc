@@ -11,11 +11,15 @@
 	
 .CODE
 
+;----------------------------------------
+;	openWriteTempFile
+;	open temp file for write
+;----------------------------------------
 openWriteTempFile PROC
 
-	MOV AH, 3DH					;Open file
-	MOV AL, 1					;Open for write
-	MOV DX, OFFSET tempFileName
+	MOV AH, 3DH						;Open file
+	MOV AL, 1						;Open for write
+	MOV DX, OFFSET tempFileName 	;Open temp.txt
 	INT 21H
 	mov fileHandleWrite, AX			;Store File Handle
 	
@@ -23,11 +27,16 @@ openWriteTempFile PROC
 	
 openWriteTempFile ENDP
 
+
+;----------------------------------------
+;	openWriteStockFile
+;	open stock file for write
+;----------------------------------------
 openWriteStockFile PROC
 
-	MOV AH, 3DH					;Open file
-	MOV AL, 1					;Open for write
-	MOV DX, OFFSET stockFileName
+	MOV AH, 3DH						;Open file
+	MOV AL, 1						;Open for write
+	MOV DX, OFFSET stockFileName	;Open phone.txt
 	INT 21H
 	mov fileHandleWrite, AX			;Store File Handle
 	
@@ -35,10 +44,14 @@ openWriteStockFile PROC
 	
 openWriteStockFile ENDP
 
+;----------------------------------------
+;	closeWriteFile
+;	close the writing file
+;----------------------------------------
 closeWriteFile PROC
 
-	MOV BX, fileHandleWrite
-	MOV AH, 3EH
+	MOV BX, fileHandleWrite		;use file handler for writing
+	MOV AH, 3EH					;close file
 	INT 21H
 	
 	RET
@@ -51,20 +64,20 @@ closeWriteFile ENDP
 ;----------------------------------------
 writeStockFileTitle PROC
 
-	MOV SI, bufferIndex
+	MOV SI, 0
 	LEA SI, writeBuffer
 
-	LEA DI, stockFileTitle
-	CALL appendString
+	LEA DI, stockFileTitle	;point the addres of title to DI
+	CALL appendString		;call to write the title to buffer
 	
 	LEA DI, newLine
-	call appendString
+	call appendString		;call to write the newline to buffer
 	
 	MOV AL, '$'
 	MOV [SI], AL
 	INC SI
 	
-	CALL writeStockFile
+	CALL writeToFile		;call to write the buffer to stockFile
 	
 	RET
 	
@@ -76,9 +89,8 @@ writeStockFileTitle ENDP
 ;----------------------------------------
 appendToBuffer PROC
 
-	PUSH SI ;This SI hold the readFilePointer
+	PUSH SI 				;This SI hold the readFilePointer
 	
-	MOV SI, bufferIndex
 	LEA SI, writeBuffer
 
 	LEA DI, Stock.phoneName
@@ -154,7 +166,7 @@ appendToBuffer PROC
 	
 	MOV bufferIndex, SI
 	
-	CALL writeStockFile
+	CALL writeToFile
 	
 	POP SI
 	RET
@@ -169,7 +181,7 @@ appendString PROC
 
 	MOV AL, [DI]
 	CMP AL, '$'
-	JE doneAppending
+	JE doneAppending	;append until delimeter
 	
 	MOV [SI], AL
 	INC DI
@@ -183,15 +195,15 @@ appendString ENDP
 
 
 ;---------------------------------
-;	writeStockFile
+;	writeToFile
 ;	write the buffer to the file
 ;---------------------------------
-writeStockFile PROC
+writeToFile PROC
 
 	LEA DI, writeBuffer
-	CALL countBufferLength
+	CALL countBufferLength	;count the buffer length
 
-    MOV AH, 40H
+    MOV AH, 40H				;write the buffer to the file
 	MOV BX, fileHandleWrite
 	LEA DX, writeBuffer
 	MOV CX, bufferLength
@@ -213,7 +225,7 @@ writeStockFile PROC
 	
 	RET
 	
-writeStockFile ENDP
+writeToFile ENDP
 
 
 ;-----------------------------------------------
@@ -226,7 +238,7 @@ countBufferLength PROC
 	resetAX
 	
 	countLengthOfBuffer:
-		;--Count the length of string by comparing '$' symbol
+		;--Count the length of string by comparing 0DH (next line)
 		
 		MOV AL, [DI]
 		

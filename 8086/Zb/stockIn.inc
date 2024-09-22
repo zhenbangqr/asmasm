@@ -12,8 +12,11 @@
 	
 .CODE
 
+;-----------------------------------------------
+;	stockInMenu
+;	menu to ask user want to stock in or not
+;-----------------------------------------------
 stockInMenu PROC
-
 	MOV AH, 09H
 	LEA DX, stockInMenuTitle
 	INT 21H
@@ -52,6 +55,11 @@ stockInMenu PROC
 	
 stockInMenu ENDP
 
+
+;-----------------------------------------------------------------------
+;	compareAndStockIn
+;	compare the search input to find the stock and continue stock in
+;-----------------------------------------------------------------------
 compareAndStockIn PROC
 
 	MOV AH, 09H
