@@ -56,30 +56,6 @@ openReadStockFile PROC
 	
 openReadStockFile ENDP
 
-;--------------------------------------------
-;	openReadTempFile
-;	open the stock file(temp.txt) for read
-;--------------------------------------------
-openReadTempFile PROC
-
-	MOV AH, 3DH					;Open file
-	MOV AL, 0					;Open for reading
-	MOV DX, OFFSET tempFileName
-	INT 21H
-	MOV fileHandle, AX			;Store File Handle
-	
-	MOV BX, fileHandle			;Use the fileHandle
-	LEA DX, readBuffer			;Address for buffer
-	MOV CX, 1024				;Read 1024 bytes
-	MOV AH, 3FH					;Read File
-	INT 21H
-	
-	LEA SI, readBuffer
-	
-	RET
-	
-openReadTempFile ENDP
-
 ;------------------------------------------------------
 ;	closeReadFile
 ;	close the stock file(Phone.txt)

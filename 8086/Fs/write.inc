@@ -15,8 +15,8 @@
 ;----------------------------------------
 openWriteStockFile PROC
 
-	MOV AH, 3CH						;Create a file
-	MOV CX, 0						;Normal file attribute
+	MOV AH, 3DH						;Create a file
+	MOV AL, 1						;Normal file attribute
 	MOV DX, OFFSET stockFileName	;Open phone.txt
 	INT 21H
 	mov fileHandleWrite, AX			;Store File Handle
@@ -68,19 +68,29 @@ writeStockFileTitle PROC
 	
 writeStockFileTitle ENDP
 
+;----------------------------------------------------------------
+;	deleteAndCreateStockFile
+;	delete and call the create stock file function for writing
+;----------------------------------------------------------------
+deleteAndCreateStockFile PROC
 
-;------------------------------------------
-;	clearFile
-;	clear the stock file by delete it
-;------------------------------------------
-clearFile PROC
 	; Delete the phone file and create again
 	MOV AH, 41h        	  ; DOS function to delete a file
 	LEA DX, stockFileName ; Address of file to delete (Phone.txt)
 	INT 21H            	  ; Call DOS
 	
+	MOV AH, 3CH						;Create a file
+	MOV CX, 0						;Normal file attribute
+	MOV DX, OFFSET stockFileName	;Open phone.txt
+	INT 21H
+	MOV BX, AX			;Store File Handle
+	
+	MOV AH, 3EH
+	INT 21H
+	
 	RET
-clearFile ENDP
+	
+deleteAndCreateStockFile ENDP
 
 ;----------------------------------------
 ;	appendStringToBuffer

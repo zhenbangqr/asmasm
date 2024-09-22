@@ -70,7 +70,7 @@ compareAndStockIn PROC
 	CALL closeReadFile
 	CALL jumpToNextLine
 	
-	CALL clearFile
+	CALL deleteAndCreateStockFile
 	
 	CALL openWriteStockFile
 	CALL writeStockFileTitle
