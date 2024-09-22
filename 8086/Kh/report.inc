@@ -427,6 +427,12 @@ displaySumOfStockValue PROC
 	
 displaySumOfStockValue ENDP
 
+;---------------------------------------------------
+;	calProfit
+;	calculate the profit for each phone
+;	display the total profit for each phone model
+;	calculate the sum of total profit
+;---------------------------------------------------
 calProfit PROC
 
 	MOV WORD PTR profit, 0
@@ -527,6 +533,10 @@ calProfit PROC
 	
 calProfit ENDP
 
+;-------------------------------------
+;	displaySumOfTotalProfit
+;	display the sum of total profit
+;-------------------------------------
 displaySumOfTotalProfit PROC
 
 	;round the floating point and add to profit
@@ -562,10 +572,10 @@ displaySumOfTotalProfit PROC
 	
 displaySumOfTotalProfit ENDP
 
-;----------------------------------------------------
+;---------------------------------------------------------------
 ;	displayFloatingPoint
-;	display the floating point for the stock value
-;----------------------------------------------------
+;	display the floating point for the stock value and profit
+;---------------------------------------------------------------
 displayFloatingPoint PROC
 
 	DIV ten8Bits
