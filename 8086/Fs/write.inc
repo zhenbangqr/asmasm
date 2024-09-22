@@ -5,27 +5,9 @@
 
 	writeBuffer DB 1024 DUP(?)    ; Buffer to store file content
 	bufferLength DW ?
-	bufferIndex DW 0
-	tempFileName DB 'TEMP.TXT', 0
 	fileHandleWrite DW ?         ; To store the file handle
 	
 .CODE
-
-;----------------------------------------
-;	openWriteTempFile
-;	open temp file for write
-;----------------------------------------
-openWriteTempFile PROC
-
-	MOV AH, 3DH						;Open file
-	MOV AL, 1						;Open for write
-	MOV DX, OFFSET tempFileName 	;Open temp.txt
-	INT 21H
-	mov fileHandleWrite, AX			;Store File Handle
-	
-	RET
-	
-openWriteTempFile ENDP
 
 ;----------------------------------------
 ;	openWriteStockFile
@@ -33,8 +15,8 @@ openWriteTempFile ENDP
 ;----------------------------------------
 openWriteStockFile PROC
 
-	MOV AH, 3DH						;Open file
-	MOV AL, 1						;Open for write
+	MOV AH, 3CH						;Create a file
+	MOV CX, 0						;Normal file attribute
 	MOV DX, OFFSET stockFileName	;Open phone.txt
 	INT 21H
 	mov fileHandleWrite, AX			;Store File Handle
@@ -43,15 +25,15 @@ openWriteStockFile PROC
 	
 openWriteStockFile ENDP
 
-;----------------------------------------
+;------------------------------------------------------
 ;	closeWriteFile
-;	close the writing file
-;----------------------------------------
+;	close the stock file when write(Phone.txt)
+;------------------------------------------------------
 closeWriteFile PROC
-
-	MOV BX, fileHandleWrite		;use file handler for writing
-	MOV AH, 3EH					;close file
-	INT 21H
+	
+	MOV BX, fileHandleWrite
+    MOV AH, 3EH             ; DOS function: close file
+    INT 21H
 	
 	RET
 	
@@ -62,6 +44,8 @@ closeWriteFile ENDP
 ;	write the title of the stock file
 ;----------------------------------------
 writeStockFileTitle PROC
+
+	PUSH SI
 
 	MOV SI, 0
 	LEA SI, writeBuffer
@@ -78,9 +62,25 @@ writeStockFileTitle PROC
 	
 	CALL writeToFile		;call to write the buffer to stockFile
 	
+	POP SI
+	
 	RET
 	
 writeStockFileTitle ENDP
+
+
+;------------------------------------------
+;	clearFile
+;	clear the stock file by delete it
+;------------------------------------------
+clearFile PROC
+	; Delete the phone file and create again
+	MOV AH, 41h        	  ; DOS function to delete a file
+	LEA DX, stockFileName ; Address of file to delete (Phone.txt)
+	INT 21H            	  ; Call DOS
+	
+	RET
+clearFile ENDP
 
 ;----------------------------------------
 ;	appendStringToBuffer
@@ -163,8 +163,6 @@ appendToBuffer PROC
 	LEA DI, newLine
 	call appendString
 	
-	MOV bufferIndex, SI
-	
 	CALL writeToFile
 	
 	POP SI
@@ -218,8 +216,6 @@ writeToFile PROC
 		MOV [DI], AL
 		INC DI
 		LOOP clearLoop
-
-	MOV bufferIndex, 0
 	
 	RET
 	
@@ -280,59 +276,3 @@ appendNumber PROC
 	RET
 	
 appendNumber ENDP
-
-;----------------------------------------------------
-;	updateFile
-;	change the new file name and clear the older one
-;----------------------------------------------------
-updateStockFileName PROC
-
-	; Delete the phone file and create again
-	MOV AH, 41h        	  ; DOS function to delete a file
-	LEA DX, stockFileName ; Address of file to delete (Phone.txt)
-	INT 21H            	  ; Call DOS
-
-	MOV AH, 3Ch         ; DOS function to create a file
-	LEA DX, stockFileName ; Address of the file name
-	MOV CX, 0           ; File attributes (0 = normal file)
-	INT 21H             ; Call DOS interrupt
-
-	CALL openWriteStockFile
-	CALL writeStockFileTitle
-	
-	CALL openReadTempFile
-	CALL jumpToNextLine
-	
-	
-	writeBackToOriginFile:
-		MOV AL, [SI]
-		CMP AX, 0
-		JE endWriteBackToOrigin
-		
-		CALL clearStockVariableBuffer
-		CALL readStockDetails
-		CALL appendToBuffer
-		JMP writeBackToOriginFile
-		
-	endWriteBackToOrigin:
-		CALL closeWriteFile
-		CALL closeReadFile
-		MOV AH, 41h        	  ; DOS function to delete a file
-		LEA DX, tempFileName ; Address of file to delete (Phone.txt)
-		INT 21H            	  ; Call DOS
-
-		MOV AH, 3Ch         ; DOS function to create a file
-		LEA DX, tempFileName ; Address of the file name
-		MOV CX, 0           ; File attributes (0 = normal file)
-		INT 21H             ; Call DOS interrupt
-	
-	done:
-		RET
-	
-	handleError:
-		; Handle the error (you can print an error message or take appropriate action)
-		MOV AH, 09h          ; Print error message
-		LEA DX, errorMsg
-		INT 21H
-		
-updateStockFileName ENDP

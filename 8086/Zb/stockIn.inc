@@ -66,11 +66,15 @@ compareAndStockIn PROC
 	LEA DX, searchTitle
 	INT 21H
 		
-	CALL openWriteTempFile
+	CALL openReadStockFile
+	CALL closeReadFile
+	CALL jumpToNextLine
+	
+	CALL clearFile
+	
+	CALL openWriteStockFile
 	CALL writeStockFileTitle
 	
-	CALL openReadStockFile
-	CALL jumpToNextLine
 	
 	CALL searchPhoneStock
 	

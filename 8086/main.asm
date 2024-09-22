@@ -96,9 +96,8 @@ MAIN PROC
 		JE menuLoop
 		
 		CALL compareAndStockOut
-		CALL closeReadFile
 		CALL closeWriteFile
-		CALL updateStockFileName
+		CALL clearReadFileBuffer
 		JMP stockOut
 	
 	searchStock:
@@ -110,6 +109,7 @@ MAIN PROC
 		
 		CALL inputAndSearch
 		CALL closeReadFile
+		CALL clearReadFileBuffer
 		JMP searchStock
 	
 	logOut:
@@ -127,9 +127,8 @@ MAIN PROC
 		JE menuLoop
 		
 		CALL compareAndStockIn
-		CALL closeReadFile
 		CALL closeWriteFile
-		CALL updateStockFileName
+		CALL clearReadFileBuffer
 		JMP stockIn
 	
 	exitProgram:

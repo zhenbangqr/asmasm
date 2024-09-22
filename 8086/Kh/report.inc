@@ -112,6 +112,7 @@ rptDetails PROC
 	reportSummary:
 		MOV numStockFound, 0
 		CALL closeReadFile
+		CALL clearReadFileBuffer
 		
 		CMP choice, 1
 		JE displayCSPPDivider

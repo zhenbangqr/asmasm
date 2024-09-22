@@ -1,5 +1,5 @@
 .DATA
-    stockFileName DB 'Phone.txt', 0
+    stockFileName DB 'PHONE.TXT', 0
     staffFileName DB 'staff.txt', 0
     readBuffer DW 1024 DUP(?)    ; Buffer to store file content
     fileHandle DW ?         ; To store the file handle
@@ -17,7 +17,6 @@ openReadStaffFile PROC
 	MOV AL, 0					;Open for reading
 	MOV DX, OFFSET staffFileName
 	INT 21H
-	JC fileError				;Jump when carry flag set(error when open file)
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
@@ -25,7 +24,6 @@ openReadStaffFile PROC
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
-	JC fileError				;Jump when carry flag set(error when open file)
 	
 	MOV SI, 0
 	LEA SI, readBuffer
@@ -44,7 +42,6 @@ openReadStockFile PROC
 	MOV AL, 0					;Open for reading
 	MOV DX, OFFSET stockFileName
 	INT 21H
-	JC fileError				;Jump when carry flag set(error when open file)
 	mov fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
@@ -52,7 +49,6 @@ openReadStockFile PROC
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
-	JC fileError				;Jump when carry flag set(error when open file)
 	
 	LEA SI, readBuffer			;point si to the offset address of readBuffer
 	
@@ -70,7 +66,6 @@ openReadTempFile PROC
 	MOV AL, 0					;Open for reading
 	MOV DX, OFFSET tempFileName
 	INT 21H
-	JC fileError				;Jump when carry flag set(error when open file)
 	MOV fileHandle, AX			;Store File Handle
 	
 	MOV BX, fileHandle			;Use the fileHandle
@@ -78,7 +73,6 @@ openReadTempFile PROC
 	MOV CX, 1024				;Read 1024 bytes
 	MOV AH, 3FH					;Read File
 	INT 21H
-	JC fileError				;Jump when carry flag set(error when open file)
 	
 	LEA SI, readBuffer
 	
@@ -87,43 +81,18 @@ openReadTempFile PROC
 openReadTempFile ENDP
 
 ;------------------------------------------------------
-;	closeStockFile
+;	closeReadFile
 ;	close the stock file(Phone.txt)
 ;------------------------------------------------------
 closeReadFile PROC
-
-	CALL clearReadFileBuffer
 	
 	MOV BX, fileHandle
     MOV AH, 3EH             ; DOS function: close file
     INT 21H
-    JC fileError            ; If carry flag is set, an error occurred
 	
 	RET
 	
 closeReadFile ENDP
-
-fileError:
-	CALL findFileError
-
-;--------------------------------------------------
-;	findFileError
-;	Show a message when error happen to the file
-;	and close the file
-;--------------------------------------------------	
-findFileError PROC
-
-    ; Handle file error
-    MOV AH, 09H
-    LEA DX, fileErrorMsg
-    INT 21H
-    JMP exitReadFile
-
-	exitReadFile:
-		CALL closeReadFile
-		RET
-	
-findFileError ENDP
 	
 ;-------------------------------------------------------
 ;	readStringFromFile
@@ -327,6 +296,9 @@ inputQuantity ENDP
 checkIsDigit PROC
 
 	MOV DI, 2
+	
+	CMP inputNumber[DI], 0DH
+	JE notDigit
 	
 	cmpIsDigit:
 		MOV AL, inputNumber[DI]
