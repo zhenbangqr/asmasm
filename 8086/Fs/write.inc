@@ -27,7 +27,6 @@ openWriteTempFile PROC
 	
 openWriteTempFile ENDP
 
-
 ;----------------------------------------
 ;	openWriteStockFile
 ;	open stock file for write
@@ -193,7 +192,6 @@ appendString PROC
 		
 appendString ENDP
 
-
 ;---------------------------------
 ;	writeToFile
 ;	write the buffer to the file
@@ -226,7 +224,6 @@ writeToFile PROC
 	RET
 	
 writeToFile ENDP
-
 
 ;-----------------------------------------------
 ;	countBufferLength
@@ -262,6 +259,7 @@ countBufferLength ENDP
 ;	append the number 
 ;---------------------------------------
 appendNumber PROC
+
 	resetCX
 	
 	appendNumberLoop:
@@ -288,6 +286,7 @@ appendNumber ENDP
 ;	change the new file name and clear the older one
 ;----------------------------------------------------
 updateStockFileName PROC
+
 	; Delete the phone file and create again
 	MOV AH, 41h        	  ; DOS function to delete a file
 	LEA DX, stockFileName ; Address of file to delete (Phone.txt)

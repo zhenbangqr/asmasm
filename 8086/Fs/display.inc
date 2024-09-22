@@ -3,10 +3,10 @@
 	
 .CODE
 
-;-----------------------------------------
+;-------------------------------------
 ;	displaySearchTitle
 ;	display the search result title
-;-----------------------------------------
+;-------------------------------------
 displaySearchTitle PROC
 
 	displayDivider
@@ -24,10 +24,10 @@ displaySearchTitle PROC
 	
 displaySearchTitle ENDP
 
-;-----------------------------------------
+;-------------------------------
 ;	displayStockDetails
 ;	display the Stock Details
-;-----------------------------------------
+;-------------------------------
 displayStockDetails PROC
 
 	resetAX
@@ -136,11 +136,11 @@ displayStockDetails PROC
 	
 displayStockDetails ENDP
 
-;-------------------------------------------
+;--------------------------------------------
 ;	displayNumber
 ;	display the number, and mov the number 
 ;	of space need to fill into CX
-;-------------------------------------------
+;--------------------------------------------
 displayNumber PROC
 
 	resetCX
@@ -169,11 +169,33 @@ displayNumber PROC
 	
 displayNumber ENDP
 
+;---------------------------------------------------------------
+;	displayFloatingPoint
+;	display the floating point for the stock value and profit
+;---------------------------------------------------------------
+displayFloatingPoint PROC
 
-;---------------------------------------
+	DIV ten8Bits
+	MOV BX, AX
+	
+	MOV AH, 02H
+	MOV DL, BL
+	ADD DL, 30H
+	INT 21H
+	
+	MOV AH, 02H
+	MOV DL, BH
+	ADD DL, 30H
+	INT 21H
+	
+	RET
+	
+displayFloatingPoint ENDP
+
+;-----------------------------------------
 ;	fillSpace
 ;   Fill with space after displayNumber
-;---------------------------------------
+;-----------------------------------------
 fillSpace PROC
 
 	autoFillSpace:
@@ -186,4 +208,3 @@ fillSpace PROC
 	RET
 	
 fillSpace ENDP
-	

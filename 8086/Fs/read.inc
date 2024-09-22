@@ -412,7 +412,6 @@ clearReadBuffer PROC
 	
 clearReadBuffer ENDP
 
-
 ;--------------------------------------------
 ;	clearStockVariableBuffer
 ;	clear the buffer for all stock variable

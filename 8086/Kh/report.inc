@@ -571,26 +571,3 @@ displaySumOfTotalProfit PROC
 	RET
 	
 displaySumOfTotalProfit ENDP
-
-;---------------------------------------------------------------
-;	displayFloatingPoint
-;	display the floating point for the stock value and profit
-;---------------------------------------------------------------
-displayFloatingPoint PROC
-
-	DIV ten8Bits
-	MOV BX, AX
-	
-	MOV AH, 02H
-	MOV DL, BL
-	ADD DL, 30H
-	INT 21H
-	
-	MOV AH, 02H
-	MOV DL, BH
-	ADD DL, 30H
-	INT 21H
-	
-	RET
-	
-displayFloatingPoint ENDP

@@ -52,12 +52,12 @@ stockOutMenu PROC
 	
 stockOutMenu ENDP
 
-
 ;-----------------------------------------------------------------------
 ;	compareAndStockOut
 ;	compare the search input to find the stock and continue stock out
 ;-----------------------------------------------------------------------
 compareAndStockOut PROC
+
 	MOV AH, 09H
 	LEA DX, searchTitle
 	INT 21H
